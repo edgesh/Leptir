@@ -3,12 +3,14 @@
 namespace Leptir\Controller;
 
 use Leptir\Broker\BrokerFactory;
-use Leptir\Broker\SQSBroker;
 use Leptir\Daemon\Daemon;
 use Leptir\Daemon\DaemonProcess;
+use Leptir\Exception\DaemonProcessException;
 use Leptir\Exception\LeptirRuntimeException;
 use Leptir\Logger\LeptirLoggerFactory;
 use Leptir\MetaBackend\MetaBackendFactory;
+use Zend\Console\Adapter\AdapterInterface;
+use Zend\Console\ColorInterface;
 use Zend\Console\Request;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Stdlib\ArrayUtils;
@@ -33,7 +35,8 @@ class DaemonController extends AbstractActionController
             try {
                 $configFromFile = Factory::fromFile($configFilename);
             } catch (\Exception $e) {
-                throw new LeptirRuntimeException(LeptirRuntimeException::CONFIGURATION_FILE_INVALID);
+                $this->writeErrorLine($e->getMessage());
+                exit(1);
             }
 
             $leptirConfig = ArrayUtils::merge(
@@ -51,21 +54,43 @@ class DaemonController extends AbstractActionController
         }
         $loggers = array();
         foreach ($loggersConfig as $name => $options) {
-            $logger = LeptirLoggerFactory::factory($name, $options);
-            $loggers[] = $logger;
+            try {
+                $logger = LeptirLoggerFactory::factory($name, $options);
+            } catch (\Exception $e) {
+                $this->writeWarningLine('(Creating logger - logger will be ignored) ' . $e->getMessage());
+                continue;
+            }
+
+            if ($logger) {
+                $loggers[] = $logger;
+            }
         }
 
         if (isset($leptirConfig['meta_storage'])) {
-            $metaBackend = MetaBackendFactory::factory($leptirConfig['meta_storage']);
+            try {
+                $metaBackend = MetaBackendFactory::factory($leptirConfig['meta_storage']);
+            } catch (\Exception $e) {
+                $this->writeErrorLine('(creating meta storage) ' . $e->getMessage());
+                exit(1);
+            }
         } else {
             $metaBackend = null;
         }
-
-        $broker = BrokerFactory::factory($leptirConfig['broker']);
+        try {
+            $broker = BrokerFactory::factory($leptirConfig['broker']);
+        } catch (\Exception $e) {
+            $this->writeErrorLine('(Creating broker) ' . $e->getMessage());
+            exit(1);
+        }
 
         $daemon = new Daemon($broker, $leptirConfig['daemon'], $loggers, $metaBackend);
-
-        $daemon->start();
+        try {
+            $daemon->start();
+        } catch (DaemonProcessException $e) {
+            $this->writeErrorLine($e->getMessage());
+        } catch (\Exception $e) {
+            $this->writeErrorLine($e->getMessage());
+        }
     }
 
     public function stopAction()
@@ -78,5 +103,19 @@ class DaemonController extends AbstractActionController
     {
         $this->stopAction();
         $this->startAction();
+    }
+
+    protected function writeErrorLine($line)
+    {
+        /** @var AdapterInterface $console */
+        $console = $this->getServiceLocator()->get('console');
+        $console->writeLine('[ERROR] ' . $line, ColorInterface::RED);
+    }
+
+    protected function writeWarningLine($line)
+    {
+        /** @var AdapterInterface $console */
+        $console = $this->getServiceLocator()->get('console');
+        $console->writeLine('[WARNING] ' . $line, ColorInterface::YELLOW);
     }
 }

@@ -3,6 +3,7 @@
 namespace Leptir\Daemon;
 
 use Leptir\Broker\BrokerTask;
+use Leptir\Exception\DaemonProcessException;
 use Leptir\MetaBackend\AbstractMetaBackend;
 
 class DaemonProcess
@@ -40,7 +41,10 @@ class DaemonProcess
     {
         $pid = getmypid();
         $this->pid = $pid;
-        file_put_contents(self::PID_FILE, $pid);
+        @file_put_contents(self::PID_FILE, $pid);
+        if (error_get_last()) {
+            throw new DaemonProcessException(DaemonProcessException::UNABLE_TO_ACCESS_PID_FILE);
+        }
     }
 
     public function createProcessForTask(BrokerTask $task, $executionTime, AbstractMetaBackend $metaBackend = null)
@@ -69,7 +73,7 @@ class DaemonProcess
             $content = @file_get_contents(self::PID_FILE);
 
             if (error_get_last()) {
-                return -1;
+                throw new DaemonProcessException(DaemonProcessException::UNABLE_TO_ACCESS_PID_FILE);
             }
 
             return intval($content);

@@ -4,6 +4,7 @@ namespace Leptir\Daemon;
 
 use Leptir\Broker\AbstractBroker;
 use Leptir\Exception\DaemonException;
+use Leptir\Exception\DaemonProcessException;
 use Leptir\Logger\LeptirLoggerTrait;
 use Leptir\MetaBackend\AbstractMetaBackend;
 
@@ -32,7 +33,14 @@ class Daemon
         array $loggers = array(),
         AbstractMetaBackend $metaBackend = null
     ) {
-        $this->daemonProcess = new DaemonProcess();
+
+        try {
+            $this->daemonProcess = new DaemonProcess();
+        } catch (DaemonProcessException $e) {
+            $this->logError($e->getMessage());
+            exit(1);
+        }
+
         $this->broker = $broker;
         $this->loggers = $loggers;
         $this->metaBackend = $metaBackend;
@@ -67,7 +75,9 @@ class Daemon
     {
         while ($this->isRunning) {
             if ($this->daemonProcess->activeChildrenCount() >= $this->NUMBER_OF_WORKERS) {
-                usleep($this->WORKERS_ACTIVE_SLEEP_TIME);
+                if ($this->WORKERS_ACTIVE_SLEEP_TIME) {
+                    usleep($this->WORKERS_ACTIVE_SLEEP_TIME);
+                }
             } else {
                 $queueSize = $this->broker->getTasksCount();
 
@@ -92,7 +102,9 @@ class Daemon
                     }
 
                 } else {
-                    usleep($this->EMPTY_QUEUE_SLEEP_TIME);
+                    if ($this->EMPTY_QUEUE_SLEEP_TIME > 0) {
+                        usleep($this->EMPTY_QUEUE_SLEEP_TIME);
+                    }
                 }
             }
             $this->daemonProcess->updateState();
@@ -138,5 +150,10 @@ class Daemon
     protected function formatLogMessage($message)
     {
         return sprintf('[%d](:MASTER:) %s', getmypid(), $message);
+    }
+
+    protected function printErrorLine($line)
+    {
+
     }
 }
