@@ -47,6 +47,8 @@ class MongoBroker extends AbstractBroker
     protected function pushBrokerTask(BrokerTask $brokerTask)
     {
         $arrayCopy = $brokerTask->getArrayCopy();
+        $id = $this->getIdForDate($brokerTask->getTimeOfExecution());
+        $arrayCopy['_id'] = $id;
         $this->saveObject($arrayCopy);
     }
 
@@ -71,7 +73,13 @@ class MongoBroker extends AbstractBroker
      */
     public function getTasksCount()
     {
-        return $this->mongoConnection->count();
+        return $this->mongoConnection->find(
+            array(
+                '_id' => array(
+                    '$lte' => $this->getCurrentId()
+                )
+            )
+        )->count();
     }
 
 
@@ -96,7 +104,11 @@ class MongoBroker extends AbstractBroker
          * Mongo operation which finds the oldest document and removes it in one atomic operation
          */
         $object = $this->mongoConnection->findAndModify(
-            array(),
+            array(
+                '_id' => array(
+                    '$lte' => $this->getCurrentId()
+                )
+            ),
             null,
             null,
             array(
@@ -113,5 +125,17 @@ class MongoBroker extends AbstractBroker
         $object = new \ArrayObject($object);
 
         return $object;
+    }
+
+    private function getIdForDate(\DateTime $time = null)
+    {
+        $timestamp = $this->getTimeStampForDate($time);
+        return sprintf('%08x%.8F', $timestamp, lcg_value());
+    }
+
+    private function getCurrentId()
+    {
+        $now = new \DateTime();
+        return sprintf('%08x%.8F', $now->getTimestamp(), 0.0);
     }
 }

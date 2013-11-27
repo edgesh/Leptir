@@ -71,4 +71,13 @@ abstract class AbstractBroker
         }
         return uniqid($pid, true);
     }
+
+    protected function getTimeStampForDate(\DateTime $time = null)
+    {
+        if (!($time instanceof \DateTime)) {
+            $time = new \DateTime();
+        }
+        $score = intval($time->format('U'));
+        return $score;
+    }
 }

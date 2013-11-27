@@ -27,13 +27,19 @@ class TesterController extends AbstractActionController
         switch($taskName)
         {
             case 'test':
-                for ($i=0; $i<1; $i++) {
+                for ($i=0; $i<5; $i++) {
                     $task = new TestTask(
                         array(
                             'message' => 'Task num: ' . (string)$i
                         )
                     );
-                    $broker->pushTask($task);
+                    if ($i != 4) {
+                        $broker->pushTask($task);
+                    } else {
+                        $now = new \DateTime();
+                        $now->add(new \DateInterval('PT60S'));
+                        $broker->pushTask($task, -1, $now);
+                    }
                 }
                 break;
         }

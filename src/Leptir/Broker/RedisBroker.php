@@ -13,7 +13,7 @@ use Predis\Client;
 class RedisBroker extends AbstractBroker
 {
     private $redisClient = null;
-    private $key = 'leptir:tasks';
+    private $key = 'leptir:ztasks';
 
     public function __construct(array $config = array())
     {
@@ -21,7 +21,7 @@ class RedisBroker extends AbstractBroker
         $host = isset($config['host']) ? $config['host'] : '127.0.0.1';
         $port = intval(isset($config['port']) ? $config['port'] : 6379);
         $database = intval(isset($config['database']) ? $config['database'] : 0);
-        $this->key = isset($config['key']) ? $config['key'] : 'leptir:tasks';
+        $this->key = isset($config['key']) ? $config['key'] : 'leptir:ztasks';
 
         $this->redisClient = new Client(
             array(
@@ -40,9 +40,10 @@ class RedisBroker extends AbstractBroker
      */
     public function pushBrokerTask(BrokerTask $task)
     {
+        $score = $this->getTimeStampForDate($task->getTimeOfExecution());
         $array = $task->getArrayCopy();
         $encoded = json_encode($array);
-        $this->redisClient->lpush($this->key, $encoded);
+        $this->redisClient->zadd($this->key, $score, $encoded);
     }
 
     /**
@@ -52,11 +53,21 @@ class RedisBroker extends AbstractBroker
      */
     public function popBrokerTask()
     {
-        $message = $this->redisClient->rpop($this->key);
+        $responses = $this->redisClient->pipeline(
+            function ($pipe) {
+                $pipe->zrange($this->key, 0, 1);
+                $pipe->zremrangebyrank($this->key, 0, 0);
+            }
+        );
+        if (is_null($responses) || empty($responses) || count($responses) !== 2) {
+            return null;
+        }
+        $message = $responses[0];
         if (is_null($message) || empty($message)) {
             return null;
         }
-        $decoded = json_decode($message, true);
+
+        $decoded = json_decode($message[0], true);
         return BrokerTask::createFromArrayCopy(new \ArrayObject($decoded));
     }
 
@@ -67,6 +78,7 @@ class RedisBroker extends AbstractBroker
      */
     public function getTasksCount()
     {
-        return $this->redisClient->llen($this->key);
+        $currentScore = $this->getTimeStampForDate(new \DateTime()) + 1;
+        return $this->redisClient->zcount($this->key, '-inf', $currentScore);
     }
 }

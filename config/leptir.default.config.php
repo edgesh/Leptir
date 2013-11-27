@@ -4,13 +4,7 @@ return array(
         'broker' => array(
             'type' => 'mongodb',
             'options' => array(
-                'host' => 'localhost',
-                'port' => 27017,
-                'database' => 'leptir',
-                'collection' => 'tasks',
-                'options' => array(
-                    'readPreference' => 'secondaryPreferred'
-                )
+
             )
         ),
         'loggers' => array(
