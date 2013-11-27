@@ -6,7 +6,6 @@ use Leptir\Broker\BrokerFactory;
 use Leptir\Daemon\Daemon;
 use Leptir\Daemon\DaemonProcess;
 use Leptir\Exception\DaemonProcessException;
-use Leptir\Exception\LeptirRuntimeException;
 use Leptir\Logger\LeptirLoggerFactory;
 use Leptir\MetaBackend\MetaBackendFactory;
 use Zend\Console\Adapter\AdapterInterface;

@@ -151,9 +151,4 @@ class Daemon
     {
         return sprintf('[%d](:MASTER:) %s', getmypid(), $message);
     }
-
-    protected function printErrorLine($line)
-    {
-
-    }
 }
