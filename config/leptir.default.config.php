@@ -2,10 +2,12 @@
 return array(
     'leptir' => array(
         'brokers' => array(
-            
+
         ),
         'loggers' => array(
-
+            'stdout' => array(
+                'type' => 'stdout'
+            )
         ),
         'daemon' => array(
             'configuration' => array(

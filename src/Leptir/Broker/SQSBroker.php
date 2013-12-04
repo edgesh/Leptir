@@ -8,6 +8,8 @@ use Leptir\Task\BaseTask;
 
 class SQSBroker extends AbstractSimpleBroker
 {
+    const DELAYED_TASK_INSERT_TIME = 6;
+
     /**
      * @var \Leptir\Helper\SQSQueue|null
      */
@@ -80,6 +82,11 @@ class SQSBroker extends AbstractSimpleBroker
         $arrayCopy = $task->getArrayCopy();
         $encoded = json_encode($arrayCopy);
         $delay = $this->convertTimeToRelativeDelay($task->getTimeOfExecution());
+
+        if ($delay > self::DELAYED_TASK_INSERT_TIME) {
+            $delay = self::DELAYED_TASK_INSERT_TIME;
+        }
+        echo "Inserting task delayed for: " . $delay . PHP_EOL;
         $this->sendMessage($encoded, $delay);
     }
 
@@ -99,6 +106,21 @@ class SQSBroker extends AbstractSimpleBroker
             return null;
         }
         $arrayCopy = new \ArrayObject($decoded);
-        return BrokerTask::createFromArrayCopy($arrayCopy);
+        $brokerTask = BrokerTask::createFromArrayCopy($arrayCopy);
+
+        $timeOfExecution = $brokerTask->getTimeOfExecution();
+        $now = new \DateTime();
+
+        if (!$timeOfExecution || $timeOfExecution <= $now) {
+            // task is ready for execution
+            return $brokerTask;
+        } else {
+            /**
+             * Task is not ready for execution yet. We have to re-insert it back to queue with
+             * some delay.
+             */
+            $this->pushBrokerTask($brokerTask);
+            return null;
+        }
     }
 }

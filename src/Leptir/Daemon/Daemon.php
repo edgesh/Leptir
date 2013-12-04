@@ -2,7 +2,6 @@
 
 namespace Leptir\Daemon;
 
-use Leptir\Broker\AbstractSimpleBroker;
 use Leptir\Broker\Broker;
 use Leptir\Broker\BrokerTask;
 use Leptir\Exception\DaemonException;
