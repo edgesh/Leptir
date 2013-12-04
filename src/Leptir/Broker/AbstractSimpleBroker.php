@@ -2,33 +2,18 @@
 
 namespace Leptir\Broker;
 
-use Leptir\Task\BaseTask;
-
-abstract class AbstractBroker
+abstract class AbstractSimpleBroker
 {
-    abstract public function __construct(array $config = array());
+    protected $priority = 0;
 
-    /**
-     * Send a new task to broker.
-     *
-     * @param BaseTask $task\
-     * @param int $priority
-     * @param \DateTime $timeOfExecution
-     * @return array
-     */
-    final public function pushTask(BaseTask $task, $priority = -1, \DateTime $timeOfExecution = null)
+    public function __construct(array $config = array())
     {
-        $taskId = $this->generateUniqueId();
-        $task->setTaskId($taskId);
-        $brokerTask = new BrokerTask($task, $priority, $timeOfExecution);
-        $this->pushBrokerTask($brokerTask);
-
-        return array(
-            'id' => $taskId,
-        );
+        if (isset($config['configuration']['priority'])) {
+            $this->priority = $config['configuration']['priority'];
+        }
     }
 
-    abstract protected function pushBrokerTask(BrokerTask $task);
+    abstract public function pushBrokerTask(BrokerTask $task);
 
     /**
      * Receive one task from broker.
@@ -62,15 +47,7 @@ abstract class AbstractBroker
         return max(-1, $timeStamp - $timeStampNow);
     }
 
-    final protected function generateUniqueId()
-    {
-        if (function_exists('posix_getpid')) {
-            $pid = (string)posix_getpid();
-        } else {
-            $pid = (string)getmypid();
-        }
-        return uniqid($pid, true);
-    }
+
 
     protected function getTimeStampForDate(\DateTime $time = null)
     {
@@ -79,5 +56,10 @@ abstract class AbstractBroker
         }
         $score = intval($time->format('U'));
         return $score;
+    }
+
+    final public function getPriority()
+    {
+        return $this->priority;
     }
 }

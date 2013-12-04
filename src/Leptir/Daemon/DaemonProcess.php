@@ -41,7 +41,7 @@ class DaemonProcess
     {
         $pid = getmypid();
         $this->pid = $pid;
-        @file_put_contents(self::PID_FILE, $pid);
+        @file_put_contents($this->getPIDFilename(), $pid);
         if (error_get_last()) {
             throw new DaemonProcessException(DaemonProcessException::UNABLE_TO_ACCESS_PID_FILE);
         }
@@ -69,8 +69,8 @@ class DaemonProcess
 
     private function getPID()
     {
-        if (file_exists(self::PID_FILE)) {
-            $content = @file_get_contents(self::PID_FILE);
+        if (file_exists($this->getPIDFilename())) {
+            $content = @file_get_contents($this->getPIDFilename());
 
             if (error_get_last()) {
                 throw new DaemonProcessException(DaemonProcessException::UNABLE_TO_ACCESS_PID_FILE);
@@ -88,7 +88,7 @@ class DaemonProcess
 
     private function deletePID()
     {
-        unlink(self::PID_FILE);
+        unlink($this->getPIDFilename());
     }
 
     private function getStillActiveChildren()
@@ -102,5 +102,15 @@ class DaemonProcess
             }
         }
         return $stillActive;
+    }
+
+    /**
+     * Method returns PID filename. Functionality extracted to separate method for testing purpose.
+     * Replacing constant filename with dynamically generated random filename enables to run multiple
+     * workers on a single box.
+     */
+    private function getPIDFilename()
+    {
+        return self::PID_FILE;
     }
 }

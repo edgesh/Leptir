@@ -252,8 +252,8 @@ abstract class BaseTask
 
     /**
      * @param string $paramName
-     * @param string|null $defaultValue
-     * @return string
+     * @param array|null $defaultValue
+     * @return array
      * @throws \Leptir\Exception\LeptirInputException
      */
     final protected function getArray($paramName, $defaultValue = null)

@@ -4,12 +4,15 @@ namespace Leptir\Helper;
 
 class SQSMessage
 {
+    /** @var null|\stdClass */
     private $messageBody;
 
     public function __construct(\CFResponse $message)
     {
-        if (isset($message->body)) {
-            $this->messageBody = $message->body->to_stdClass();
+        /** @var \CFSimpleXML $body */
+        $body = $message->body;
+        if (isset($body)) {
+            $this->messageBody = $body->to_stdClass();
         } else {
             $this->messageBody = null;
         }

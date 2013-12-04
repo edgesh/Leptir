@@ -24,7 +24,14 @@ class SQSQueue
             $this->queueName,
             array('AttributeName' => 'ApproximateNumberOfMessages')
         );
-        $stdResponse = $resp->body->to_stdClass();
+
+        /** @var \CFSimpleXML $body */
+        $body = $resp->body;
+        if (!$body) {
+            return 0;
+        }
+        /** @var \stdClass $stdResponse */
+        $stdResponse = $body->to_stdClass();
 
         $value = 0;
         if (isset($stdResponse->GetQueueAttributesResult->Attribute->Value)) {

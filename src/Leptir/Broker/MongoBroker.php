@@ -2,8 +2,6 @@
 
 namespace Leptir\Broker;
 
-use Leptir\Exception\MongoBrokerException;
-use Leptir\Task\BaseTask;
 use Zend\Stdlib\ArrayUtils;
 
 /**
@@ -11,7 +9,7 @@ use Zend\Stdlib\ArrayUtils;
  * @package Leptir\Broker
  */
 
-class MongoBroker extends AbstractBroker
+class MongoBroker extends AbstractSimpleBroker
 {
     const DEFAULT_HOST = 'localhost';
     const DEFAULT_PORT = 27017;
@@ -26,25 +24,29 @@ class MongoBroker extends AbstractBroker
 
     public function __construct(array $config = array())
     {
-        $host = isset($config['host']) ? $config['host'] : self::DEFAULT_HOST;
-        $port = isset($config['port']) ? $config['port'] : self::DEFAULT_PORT;
-        $database = isset($config['database']) ? $config['database'] : self::DEFAULT_DATABASE;
-        $collection = isset($config['collection']) ? $config['collection'] : self::DEFAULT_COLLECTION;
+        parent::__construct($config);
 
-        $options = array(
+        $connection = isset($config['connection']) ? $config['connection'] : array();
+
+        $host = isset($connection['host']) ? $connection['host'] : self::DEFAULT_HOST;
+        $port = isset($connection['port']) ? $connection['port'] : self::DEFAULT_PORT;
+        $database = isset($connection['database']) ? $connection['database'] : self::DEFAULT_DATABASE;
+        $collection = isset($connection['collection']) ? $connection['collection'] : self::DEFAULT_COLLECTION;
+
+        $connectionOptions = array(
             'connect' => true
         );
 
-        if (isset($config['options'])) {
-            $options = ArrayUtils::merge($options, $config['options']);
+        if (isset($connection['options'])) {
+            $connectionOptions = ArrayUtils::merge($connectionOptions, $connection['options']);
         }
 
-        $hostConnection = new \MongoClient('mongodb://' . $host . ':' . (string)$port, $options);
+        $hostConnection = new \MongoClient('mongodb://' . $host . ':' . (string)$port, $connectionOptions);
         $dbConnection = $hostConnection->$database;
         $this->mongoConnection = $dbConnection->$collection;
     }
 
-    protected function pushBrokerTask(BrokerTask $brokerTask)
+    public function pushBrokerTask(BrokerTask $brokerTask)
     {
         $arrayCopy = $brokerTask->getArrayCopy();
         $id = $this->getIdForDate($brokerTask->getTimeOfExecution());
@@ -94,9 +96,7 @@ class MongoBroker extends AbstractBroker
     }
 
     /**
-     * TODO priority support
-     *
-     * @returns \ArrayObject
+     * @return \ArrayObject|null
      */
     private function fetchNextObject()
     {
