@@ -15,7 +15,9 @@ class TestTask extends BaseTask
     protected function doJob()
     {
         $message = $this->getString('message', '');
-        $this->logInf($message);
+        $this->logInfo($message);
+
+        $this->addResponseLine('Test task done.');
         return self::EXIT_SUCCESS;
     }
 }

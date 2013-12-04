@@ -18,6 +18,8 @@ class SlowTask extends BaseTask
         $sleepTime = rand(6, 19);
         $this->logInfo('Sleeping for '. $sleepTime);
         sleep($sleepTime);
+
+        $this->addResponseLine('Task had a great nap');
         return self::EXIT_SUCCESS;
     }
 }

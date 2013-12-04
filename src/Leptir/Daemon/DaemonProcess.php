@@ -41,7 +41,7 @@ class DaemonProcess
     {
         $pid = getmypid();
         $this->pid = $pid;
-        @file_put_contents($this->PID_FILE, $pid);
+        @file_put_contents($this->getPIDFilename(), $pid);
         if (error_get_last()) {
             throw new DaemonProcessException(DaemonProcessException::UNABLE_TO_ACCESS_PID_FILE);
         }
