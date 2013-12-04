@@ -20,8 +20,8 @@ class Module
     public function getConfig()
     {
         $configs = array(
-            __DIR__ . '/config/module.config.php',
-            __DIR__ . '/config/leptir.default.config.php'
+            __DIR__ . '/../../config/module.config.php',
+            __DIR__ . '/../../config/leptir.default.config.php'
         );
 
         return Factory::fromFiles($configs);
