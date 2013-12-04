@@ -9,28 +9,33 @@ Leptir configuration
     return array(
         'leptir' => array(
             'brokers' => array(
-                array(
-                'type' => 'mongodb',
-                'connection' => array(
-                    'collection' => 'tasksp1'
-                    // default values will be used
-                ),
-                'configuration' => array(
-                    'priority' => 1,
-                    'task_count_caching_time' => 0.6
-                )
-            ),
-            array(
-                'type' => 'mongodb',
-                'connection' => array(
-                    'collection' => 'tasksp2'
-                    // default values will be used
-                ),
-                'configuration' => array(
-                    'priority' => 2
-                )
-            )
-                // brokers configuration explained leter
+               	array(
+                	'type' => 'mongodb',
+                	'connection' => array(
+                    		'collection' => 'tasksp1',
+                    		'host' => 'localhost',
+                    		'port' => 27017,
+                    		'database' => 'leptir',
+                    		'options' => array(
+                    			'secondaryPreferred' => true
+                    		)
+                    		
+                	),
+                	'configuration' => array(
+                    		'priority' => 1,
+                    		'task_count_caching_time' => 0.6
+                	)
+            	),
+            	array(
+                	'type' => 'mongodb',
+                	'connection' => array(
+                    		'collection' => 'tasksp2'
+                    		// default values will be used
+                	),
+                	'configuration' => array(
+                    		'priority' => 2
+                	)
+            	)
             ),
             'loggers' => array(
                 // loggers configuration explained later
@@ -88,6 +93,10 @@ Broker methods:
     public function pushTask(BaseTask $task, \DateTime $timeOfExecution = null, $priority)
 ```
 Method is used to push a new task into the queue.
+
+Every broker has couple of configuration options:
+- **priority** - priority level of the broker (lower number means higher priority)
+- **task_count_caching_time** - Amount of seconds broker will cache information about current number of tasks in the queue. Used to reduce number of request to database/SQS.
 
 
 #### MongoDB broker
