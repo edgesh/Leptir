@@ -299,11 +299,5 @@ Method will return float number represending the execution time.
 ```php
     protected function logDebug($message)
 ```
-License
-----
-
-[MIT](http://en.wikipedia.org/wiki/MIT_License)
-
-Copyright (C) 2013 Backplane, INC
   
     
