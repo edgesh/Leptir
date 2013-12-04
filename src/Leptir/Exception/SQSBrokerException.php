@@ -4,7 +4,6 @@ namespace Leptir\Exception;
 
 class SQSBrokerException extends LeptirBaseException
 {
-    /** CODES */
     const CONFIG_MISSING = 1;
     const SQS_KEY_MISSNING = 2;
     const SQS_SECRET_MISSING = 3;

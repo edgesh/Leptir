@@ -24,16 +24,15 @@ class BrokerFactory
               throw new BrokerFactoryException(BrokerFactoryException::BROKER_TYPE_NOT_DEFINED);
         }
         $brokerType = $config['type'];
-        $options = isset($config['options']) ? $config['options'] : array();
 
         switch($brokerType)
         {
             case self::BROKER_SQS:
-                return new SQSBroker($options);
+                return new SQSBroker($config);
             case self::BROKER_MONGO:
-                return new MongoBroker($options);
+                return new MongoBroker($config);
             case self::BROKER_REDIS:
-                return new RedisBroker($options);
+                return new RedisBroker($config);
             default:
                 throw new BrokerFactoryException(BrokerFactoryException::BROKER_NOT_SUPPORTED);
         }

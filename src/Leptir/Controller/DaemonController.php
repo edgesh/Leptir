@@ -2,7 +2,7 @@
 
 namespace Leptir\Controller;
 
-use Leptir\Broker\BrokerFactory;
+use Leptir\Broker\Broker;
 use Leptir\Daemon\Daemon;
 use Leptir\Daemon\DaemonProcess;
 use Leptir\Exception\DaemonProcessException;
@@ -75,12 +75,9 @@ class DaemonController extends AbstractActionController
         } else {
             $metaBackend = null;
         }
-        try {
-            $broker = BrokerFactory::factory($leptirConfig['broker']);
-        } catch (\Exception $e) {
-            $this->writeErrorLine('(Creating broker) ' . $e->getMessage());
-            exit(1);
-        }
+
+        $brokersSettings = isset($leptirConfig['brokers']) ? $leptirConfig['brokers'] : array();
+        $broker = new Broker($brokersSettings, $loggers);
 
         $daemon = new Daemon($broker, $leptirConfig['daemon'], $loggers, $metaBackend);
         try {

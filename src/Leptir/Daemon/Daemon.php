@@ -2,7 +2,9 @@
 
 namespace Leptir\Daemon;
 
-use Leptir\Broker\AbstractBroker;
+use Leptir\Broker\AbstractSimpleBroker;
+use Leptir\Broker\Broker;
+use Leptir\Broker\BrokerTask;
 use Leptir\Exception\DaemonException;
 use Leptir\Exception\DaemonProcessException;
 use Leptir\Logger\LeptirLoggerTrait;
@@ -22,17 +24,16 @@ class Daemon
     private $TASK_EXECUTION_TIME;
 
     private $daemonProcess;
-    private $broker;
     private $isRunning = true;
     private $metaBackend = null;
 
-
     public function __construct (
-        AbstractBroker $broker,
+        Broker $broker,
         array $daemonConfig,
         array $loggers = array(),
         AbstractMetaBackend $metaBackend = null
     ) {
+        $this->loggers = $loggers;
 
         try {
             $this->daemonProcess = new DaemonProcess();
@@ -40,9 +41,8 @@ class Daemon
             $this->logError($e->getMessage());
             exit(1);
         }
-
         $this->broker = $broker;
-        $this->loggers = $loggers;
+
         $this->metaBackend = $metaBackend;
         $this->isRunning = true;
 
@@ -79,7 +79,7 @@ class Daemon
                     usleep($this->WORKERS_ACTIVE_SLEEP_TIME);
                 }
             } else {
-                $queueSize = $this->broker->getTasksCount();
+                $queueSize = $this->broker->getBoundedNumberOfTasks($this->NUMBER_OF_WORKERS);
 
                 if ($queueSize) {
                     $numberToSpawn = min(
@@ -89,10 +89,10 @@ class Daemon
                     );
 
                     for ($i=0; $i<$numberToSpawn; $i++) {
-                        $task = $this->broker->popBrokerTask();
+                        /** @var BrokerTask $task */
+                        $task = $this->broker->getOneTask();
                         if ($task) {
                             $task->subscribeLoggers($this->loggers);
-
                             $this->daemonProcess->createProcessForTask(
                                 $task,
                                 $this->TASK_EXECUTION_TIME,
@@ -100,7 +100,6 @@ class Daemon
                             );
                         }
                     }
-
                 } else {
                     if ($this->EMPTY_QUEUE_SLEEP_TIME > 0) {
                         usleep($this->EMPTY_QUEUE_SLEEP_TIME);

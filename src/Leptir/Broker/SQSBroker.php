@@ -6,7 +6,7 @@ use Leptir\Exception\SQSBrokerException;
 use Leptir\Helper\SQSQueue;
 use Leptir\Task\BaseTask;
 
-class SQSBroker extends AbstractBroker
+class SQSBroker extends AbstractSimpleBroker
 {
     /**
      * @var \Leptir\Helper\SQSQueue|null
@@ -15,20 +15,24 @@ class SQSBroker extends AbstractBroker
 
     public function __construct(array $config = array())
     {
-        if (!isset($config['sqs_key'])) {
+        parent::__construct($config);
+
+        $connection = isset($config['connection']) ? $config['connection'] : array();
+
+        if (!isset($connection['sqs_key'])) {
             throw new SQSBrokerException(SQSBrokerException::SQS_KEY_MISSNING);
         }
-        if (!isset($config['sqs_secret'])) {
+        if (!isset($connection['sqs_secret'])) {
             throw new SQSBrokerException(SQSBrokerException::SQS_SECRET_MISSING);
         }
-        if (!isset($config['sqs_queue'])) {
+        if (!isset($connection['sqs_queue'])) {
             throw new SQSBrokerException(SQSBrokerException::SQS_URL_MISSING);
         }
 
         $this->SQSQueue = new SQSQueue(
-            $config['sqs_key'],
-            $config['sqs_secret'],
-            $config['sqs_queue']
+            $connection['sqs_key'],
+            $connection['sqs_secret'],
+            $connection['sqs_queue']
         );
     }
 
@@ -81,8 +85,6 @@ class SQSBroker extends AbstractBroker
 
     /**
      * Receive one task from broker.
-     *
-     * TODO priority support possible ?
      *
      * @return BrokerTask
      */

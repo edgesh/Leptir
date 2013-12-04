@@ -2,7 +2,6 @@
 
 namespace Leptir\Broker;
 
-use Leptir\Task\BaseTask;
 use Predis\Client;
 
 /**
@@ -10,18 +9,22 @@ use Predis\Client;
  * @package Leptir\Broker
  */
 
-class RedisBroker extends AbstractBroker
+class RedisBroker extends AbstractSimpleBroker
 {
     private $redisClient = null;
     private $key = 'leptir:ztasks';
 
     public function __construct(array $config = array())
     {
-        $scheme = isset($config['scheme']) ? $config['scheme'] : 'tcp';
-        $host = isset($config['host']) ? $config['host'] : '127.0.0.1';
-        $port = intval(isset($config['port']) ? $config['port'] : 6379);
-        $database = intval(isset($config['database']) ? $config['database'] : 0);
-        $this->key = isset($config['key']) ? $config['key'] : 'leptir:ztasks';
+        parent::__construct($config);
+
+        $connection = isset($config['connection']) ? $config['connection'] : array();
+
+        $scheme = isset($connection['scheme']) ? $connection['scheme'] : 'tcp';
+        $host = isset($connection['host']) ? $connection['host'] : '127.0.0.1';
+        $port = intval(isset($connection['port']) ? $connection['port'] : 6379);
+        $database = intval(isset($connection['database']) ? $connection['database'] : 0);
+        $this->key = isset($connection['key']) ? $connection['key'] : 'leptir:ztasks';
 
         $this->redisClient = new Client(
             array(

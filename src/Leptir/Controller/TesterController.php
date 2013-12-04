@@ -2,7 +2,7 @@
 
 namespace Leptir\Controller;
 
-use Leptir\Broker\BrokerFactory;
+use Leptir\Broker\Broker;
 use Leptir\Task\Test\TestTask;
 use Zend\Console\Request;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -22,24 +22,18 @@ class TesterController extends AbstractActionController
 
         $taskName = $request->getParam('taskName');
 
-        $broker = BrokerFactory::factory($leptirConfig['broker']);
+        $broker = new Broker($leptirConfig['brokers']);
 
         switch($taskName)
         {
             case 'test':
-                for ($i=0; $i<5; $i++) {
+                for ($i=0; $i<1000; $i++) {
                     $task = new TestTask(
                         array(
                             'message' => 'Task num: ' . (string)$i
                         )
                     );
-                    if ($i != 4) {
-                        $broker->pushTask($task);
-                    } else {
-                        $now = new \DateTime();
-                        $now->add(new \DateInterval('PT60S'));
-                        $broker->pushTask($task, -1, $now);
-                    }
+                    $broker->pushTask($task, null, 1);
                 }
                 break;
         }

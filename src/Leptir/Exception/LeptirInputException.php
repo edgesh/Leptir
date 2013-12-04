@@ -4,7 +4,6 @@ namespace Leptir\Exception;
 
 class LeptirInputException extends LeptirBaseException
 {
-    /** CODES */
     const NOT_AN_INT = 1;
     const NOT_A_STRING = 2;
     const NOT_A_FLOAT = 3;

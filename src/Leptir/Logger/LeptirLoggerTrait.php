@@ -9,12 +9,12 @@ trait LeptirLoggerTrait
     protected $loggers = array();
 
 
-    public function subscribeLogger(Logger $logger)
+    final public function subscribeLogger(Logger $logger)
     {
         $this->loggers[] = $logger;
     }
 
-    public function subscribeLoggers(array $loggers)
+    final public function subscribeLoggers(array $loggers)
     {
         foreach ($loggers as $logger) {
             if ($logger instanceof Logger) {
