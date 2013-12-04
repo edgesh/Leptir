@@ -86,7 +86,6 @@ class SQSBroker extends AbstractSimpleBroker
         if ($delay > self::DELAYED_TASK_INSERT_TIME) {
             $delay = self::DELAYED_TASK_INSERT_TIME;
         }
-        echo "Inserting task delayed for: " . $delay . PHP_EOL;
         $this->sendMessage($encoded, $delay);
     }
 
