@@ -73,7 +73,7 @@ class MongoBroker extends AbstractSimpleBroker
      *
      * @return int
      */
-    public function getTasksCount()
+    protected function tasksCount()
     {
         return $this->mongoConnection->find(
             array(

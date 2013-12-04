@@ -18,19 +18,26 @@ class MongoMetaBackend extends AbstractMetaBackend
 
     public function __construct(array $config = array())
     {
-        $host = isset($config['host']) ? $config['host'] : self::DEFAULT_HOST;
-        $port = isset($config['port']) ? $config['port'] : self::DEFAULT_PORT;
-        $database = isset($config['database']) ? $config['database'] : self::DEFAULT_DATABASE;
-        $collection = isset($config['collection']) ? $config['collection'] : self::DEFAULT_COLLECTION;
+        $connection = isset($config['connection']) ? $config['connection'] : array();
+
+        $host = isset($connection['host']) ? $connection['host'] : self::DEFAULT_HOST;
+        $port = isset($connection['port']) ? $connection['port'] : self::DEFAULT_PORT;
+        $database = isset($connection['database']) ? $connection['database'] : self::DEFAULT_DATABASE;
+        $collection = isset($connection['collection']) ? $connection['collection'] : self::DEFAULT_COLLECTION;
+
         $options = array(
             'connect' => true
         );
-        if (isset($config['options'])) {
-            $options = ArrayUtils::merge($options, $config['options']);
+        if (isset($connection['options'])) {
+            $options = ArrayUtils::merge($options, $connection['options']);
         }
         $hostConnection = new \MongoClient('mongodb://' . $host . ':' . (string)$port, $options);
         $dbConnection = $hostConnection->$database;
         $this->mongoConnection = $dbConnection->$collection;
+
+        /**
+         * Configuration parameters processing goes here
+         */
     }
 
     public function saveMetaInfo(\ArrayObject $object)

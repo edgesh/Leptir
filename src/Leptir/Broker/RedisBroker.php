@@ -79,7 +79,7 @@ class RedisBroker extends AbstractSimpleBroker
      *
      * @return int
      */
-    public function getTasksCount()
+    protected function tasksCount()
     {
         $currentScore = $this->getTimeStampForDate(new \DateTime()) + 1;
         return $this->redisClient->zcount($this->key, '-inf', $currentScore);

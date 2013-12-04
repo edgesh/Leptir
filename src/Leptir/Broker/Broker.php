@@ -200,23 +200,11 @@ class Broker
 
     final private function getTasksCountForQueue($index)
     {
-        if (!isset($this->queueCountCache[$index]) ||
-            (time() - $this->queueCountCache[$index]['refreshed'] > 1)) {
-
-            $this->refreshQueueCount($index);
-        }
-        return isset($this->queueCountCache[$index]) ? $this->queueCountCache[$index]['count'] : 0;
-    }
-
-    final private function refreshQueueCount($index)
-    {
         $broker = isset($this->simpleBrokers[$index]) ? $this->simpleBrokers[$index] : null;
-        if (!($broker instanceof AbstractSimpleBroker)) {
-            return ;
+
+        if ($broker instanceof AbstractSimpleBroker) {
+            return $broker->getTasksCount();
         }
-        $this->queueCountCache[$index] = array(
-            'count' => $broker->getTasksCount(),
-            'refreshed' => time()
-        );
+        return 0;
     }
 }

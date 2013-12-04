@@ -69,7 +69,7 @@ class SQSBroker extends AbstractSimpleBroker
      *
      * @return int
      */
-    public function getTasksCount()
+    protected function tasksCount()
     {
         return $this->SQSQueue->approximateCount();
     }
