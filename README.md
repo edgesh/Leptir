@@ -16,7 +16,8 @@ Leptir configuration
                     // default values will be used
                 ),
                 'configuration' => array(
-                    'priority' => 1
+                    'priority' => 1,
+                    'task_count_caching_time' => 0.6
                 )
             ),
             array(
@@ -39,7 +40,8 @@ Leptir configuration
                     'task_execution_time' => 600,
                     'number_of_workers' => 4,
                     'empty_queue_sleep_time' => 0.5,
-                    'workers_active_sleep_time' => 0.2
+                    'workers_active_sleep_time' => 0.2,
+                    'task_count_caching_time' => 0.6
                 )
             ),
             'meta_storage' => array(
