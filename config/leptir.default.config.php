@@ -2,14 +2,8 @@
 return array(
     'leptir' => array(
         'brokers' => array(
-            array(
-                'type' => 'mongodb'
-            )
         ),
         'loggers' => array(
-            'stdout' => array(
-                'type' => 'stdout'
-            )
         ),
         'daemon' => array(
             'configuration' => array(
