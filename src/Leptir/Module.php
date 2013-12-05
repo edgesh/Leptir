@@ -4,17 +4,15 @@ namespace Leptir;
 
 
 use Zend\Console\Adapter\AdapterInterface;
-use Zend\Mvc\ModuleRouteListener;
-use Zend\Mvc\MvcEvent;
 use Zend\Config\Factory;
+use Zend\EventManager\EventInterface;
 
 class Module
 {
-    public function onBootstrap(MvcEvent $e)
+    public function onBootstrap(EventInterface $event)
     {
-        $eventManager        = $e->getApplication()->getEventManager();
-        $moduleRouteListener = new ModuleRouteListener();
-        $moduleRouteListener->attach($eventManager);
+        /* @var $app \Zend\Mvc\ApplicationInterface */
+        $app    = $event->getTarget();
     }
 
     public function getConfig()
@@ -32,7 +30,7 @@ class Module
         return array(
             'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
-                    __NAMESPACE__ => __DIR__ . '/' . __NAMESPACE__,
+                    __NAMESPACE__ => __DIR__ . '/../../src/' . __NAMESPACE__,
                 ),
             ),
         );
