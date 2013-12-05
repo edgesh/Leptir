@@ -118,8 +118,8 @@ class Broker implements ServiceLocatorAwareInterface
                 }
 
                 // Service locator injection
-                if ($task instanceof ServiceLocatorAwareInterface) {
-                    $task->setServiceLocator($this->getServiceLocator());
+                if ($task && $task->getTask() instanceof ServiceLocatorAwareInterface) {
+                    $task->injectServiceLocator($this->getServiceLocator());
                 }
 
                 return $task;

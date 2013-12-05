@@ -5,6 +5,8 @@ namespace Leptir\Broker;
 use Leptir\MetaBackend\AbstractMetaBackend;
 use Leptir\Task\BaseTask;
 use Zend\Log\Logger;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Decorator for Leptir\Task\BaseTask
@@ -165,5 +167,12 @@ class BrokerTask
     final public function getTaskReturnCode()
     {
         return $this->task->getReturnCode();
+    }
+
+    final public function injectServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        if ($this->task instanceof ServiceLocatorAwareInterface) {
+            $this->task->setServiceLocator($serviceLocator);
+        }
     }
 }
