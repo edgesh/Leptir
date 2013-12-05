@@ -1,7 +1,7 @@
 {
     "name": "backplane/leptir",
     "description": "Background task processor",
-    "keywords": ["tasks", "queue", "background", "asynchronous"],
+    "keywords": ["tasks", "queue", "background", "asynchronous", "zf2"],
     "homepage": "http://thebackplane.com",
     "license": "Apache 2.0",
     "require": {
