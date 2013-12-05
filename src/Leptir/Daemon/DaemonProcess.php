@@ -67,7 +67,7 @@ class DaemonProcess
         return count($this->childProcesses);
     }
 
-    private function getPID()
+    public function getPID()
     {
         if (file_exists($this->getPIDFilename())) {
             $content = @file_get_contents($this->getPIDFilename());
@@ -83,7 +83,11 @@ class DaemonProcess
 
     private function processIsRunning()
     {
-        return Process::processIsRunning($this->pid);
+        if (!$this->getPID()) {
+            return false;
+        }
+
+        return Process::processIsRunning($this->getPid());
     }
 
     private function deletePID()
@@ -112,5 +116,12 @@ class DaemonProcess
     private function getPIDFilename()
     {
         return self::PID_FILE;
+    }
+
+    public function sendSignal($sig = SIGTERM)
+    {
+        if ($this->getPID()) {
+            posix_kill($this->getPID(), $sig);
+        }
     }
 }

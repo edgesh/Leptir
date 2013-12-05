@@ -2,6 +2,7 @@
 return array(
     'leptir' => array(
         'brokers' => array(
+
         ),
         'loggers' => array(
         ),
@@ -14,13 +15,6 @@ return array(
             )
         ),
         'meta_storage' => array(
-            'type' => 'mongodb',
-            'connection' => array(
-
-            ),
-            'configuration' => array(
-
-            )
         )
     )
 );

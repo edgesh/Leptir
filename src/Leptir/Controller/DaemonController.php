@@ -19,12 +19,17 @@ class DaemonController extends AbstractActionController
 {
     public function startAction()
     {
+        $daemonProcess = new DaemonProcess();
+        if ($daemonProcess->getPID()) {
+            $this->writeErrorLine("Leptir is already running. Only one leptir can fly inside the box at the time.");
+            exit(1);
+        }
+
         $request = $this->getRequest();
 
         if (!$request instanceof Request) {
             throw new \RuntimeException('You can only use this action from a console.');
         }
-
         $serviceConfig = $this->serviceLocator->get('config');
         $leptirConfig = isset($serviceConfig['leptir']) ? $serviceConfig['leptir'] : array();
 
@@ -40,9 +45,7 @@ class DaemonController extends AbstractActionController
 
             $leptirConfig = ArrayUtils::merge(
                 $leptirConfig,
-                array(
-                    'leptir' => $configFromFile
-                )
+                $configFromFile
             );
         }
 
@@ -51,6 +54,7 @@ class DaemonController extends AbstractActionController
         if (isset($leptirConfig['loggers'])) {
             $loggersConfig = $leptirConfig['loggers'];
         }
+
         $loggers = array();
         foreach ($loggersConfig as $name => $options) {
             try {
@@ -92,13 +96,75 @@ class DaemonController extends AbstractActionController
     public function stopAction()
     {
         $daemonProcess = new DaemonProcess();
-        $daemonProcess->waitForProcessesToFinish();
+        if (!$daemonProcess->getPID()) {
+            $this->writeErrorLine("Leptir is already dead. That's not very nice of you.");
+            exit(1);
+        }
+
+        $daemonProcess->sendSignal(SIGTERM);
     }
 
     public function restartAction()
     {
         $this->stopAction();
         $this->startAction();
+    }
+
+    /**
+     * Install action detects the OS and installs daemon support
+     */
+    public function installAction()
+    {
+        $request = $this->getRequest();
+        if (!$request instanceof Request) {
+            throw new \RuntimeException('You can only use this action from a console.');
+        }
+
+        $configPath = $request->getParam('config');
+
+        if ($configPath) {
+            $configString = ' --config=' . $configPath;
+        } else {
+            $configString = '';
+        }
+        $indexPath = realpath(__DIR__ . '/../../../../../public/index.php');
+
+        file_put_contents(
+            '/etc/init.d/leptir',
+            sprintf(
+'#!/bin/bash
+case "$1" in
+start)
+    if [ -f "/var/run/leptir.pid" ] ; then
+        echo "Leptir is already running."
+        exit 1
+    fi
+    echo "Starting a little butterfly."
+    php %s leptir daemon start %s >& /dev/null &
+;;
+stop)
+    if [ ! -f "/var/run/leptir.pid" ] ; then
+        echo "Leptir is already dead. :("
+        exit 1
+    fi
+    echo "Stopping a little butterfly. You\'ll have to wait for all the tasks to finish though."
+    php %s leptir daemon stop >& /dev/null &
+;;
+restart)
+    echo "Restarting a little butterfly. You\'ll have to wait for all the tasks to finish before that action."
+    php %s leptir daemon restart %s >& /dev/null &
+;;
+*)
+    echo "Usage: $0 (start|stop|restart)"
+    exit 1
+esac
+
+exit 0
+',
+$indexPath, $configString,
+$indexPath,
+$indexPath, $configString)
+        );
     }
 
     protected function writeErrorLine($line)
