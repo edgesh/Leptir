@@ -4,6 +4,7 @@
     "keywords": ["tasks", "queue", "background", "asynchronous", "zf2"],
     "homepage": "http://thebackplane.com",
     "license": "Apache 2.0",
+    "type":         "library",
     "require": {
         "php": ">=5.4.0",
         "zendframework/zendframework": "2.2.5",
