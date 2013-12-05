@@ -5,12 +5,11 @@ namespace Leptir;
 
 use Zend\Config\Factory;
 use Zend\Console\Adapter\AdapterInterface;
-use Zend\EventManager\EventInterface;
+use Zend\Loader\AutoloaderFactory;
+use Zend\Loader\StandardAutoloader;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
-use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
-use Zend\ModuleManager\Feature\ControllerPluginProviderInterface;
-use Zend\ModuleManager\Feature\ViewHelperProviderInterface;
+use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
 
 /**
  * Circlical ACL Admin Interface for BJYAuthorize
@@ -19,17 +18,9 @@ use Zend\ModuleManager\Feature\ViewHelperProviderInterface;
  */
 class Module implements
     AutoloaderProviderInterface,
-    BootstrapListenerInterface,
     ConfigProviderInterface,
-    ControllerPluginProviderInterface,
-    ViewHelperProviderInterface
+    ConsoleUsageProviderInterface
 {
-    public function onBootstrap(EventInterface $event)
-    {
-        /* @var $app \Zend\Mvc\ApplicationInterface */
-        $app    = $event->getTarget();
-    }
-
     public function getConfig()
     {
         $configs = array(
@@ -43,9 +34,9 @@ class Module implements
     public function getAutoloaderConfig()
     {
         return array(
-            'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
-                    __NAMESPACE__ => __DIR__ . '/../../src/' . __NAMESPACE__,
+            AutoloaderFactory::STANDARD_AUTOLOADER => array(
+                StandardAutoloader::LOAD_NS => array(
+                    __NAMESPACE__ => __DIR__,
                 ),
             ),
         );
@@ -60,35 +51,4 @@ class Module implements
             'index.php leptir tester <action> <taskName>'
         );
     }
-
-    public function getServiceConfig()
-    {
-        return array();
-    }
-
-    public function getViewHelperConfig()
-    {
-        return array(
-            'factories' => array(
-
-            ),
-        );
-    }
-
-    /**
-     * Expected to return \Zend\ServiceManager\Config object or array to
-     * seed such an object.
-     *
-     * @return array|\Zend\ServiceManager\Config
-     */
-    public function getControllerPluginConfig()
-    {
-        return array(
-            'factories' => array(
-
-            ),
-        );
-    }
-
-
 }
