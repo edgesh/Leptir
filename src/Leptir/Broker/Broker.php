@@ -65,7 +65,7 @@ class Broker
     /**
      * Get one task from brokers following priority rules
      */
-    final public function getOneTask()
+    public function getOneTask()
     {
         $r = 1.0 * mt_rand() / mt_getrandmax();
         $numberOfBrokers = count($this->simpleBrokers);
