@@ -3,11 +3,26 @@
 namespace Leptir;
 
 
-use Zend\Console\Adapter\AdapterInterface;
 use Zend\Config\Factory;
+use Zend\Console\Adapter\AdapterInterface;
 use Zend\EventManager\EventInterface;
+use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\ModuleManager\Feature\BootstrapListenerInterface;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Zend\ModuleManager\Feature\ControllerPluginProviderInterface;
+use Zend\ModuleManager\Feature\ViewHelperProviderInterface;
 
-class Module
+/**
+ * Circlical ACL Admin Interface for BJYAuthorize
+ *
+ * @author Alexandre Lemaire <alemaire@circlical.com>
+ */
+class Module implements
+    AutoloaderProviderInterface,
+    BootstrapListenerInterface,
+    ConfigProviderInterface,
+    ControllerPluginProviderInterface,
+    ViewHelperProviderInterface
 {
     public function onBootstrap(EventInterface $event)
     {
@@ -50,5 +65,30 @@ class Module
     {
         return array();
     }
+
+    public function getViewHelperConfig()
+    {
+        return array(
+            'factories' => array(
+
+            ),
+        );
+    }
+
+    /**
+     * Expected to return \Zend\ServiceManager\Config object or array to
+     * seed such an object.
+     *
+     * @return array|\Zend\ServiceManager\Config
+     */
+    public function getControllerPluginConfig()
+    {
+        return array(
+            'factories' => array(
+
+            ),
+        );
+    }
+
 
 }
