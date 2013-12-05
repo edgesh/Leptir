@@ -4,13 +4,16 @@ namespace Leptir\Broker;
 
 use Leptir\Logger\LeptirLoggerTrait;
 use Leptir\Task\BaseTask;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
-class Broker
+class Broker implements ServiceLocatorAwareInterface
 {
     use LeptirLoggerTrait;
 
     private $simpleBrokers = array();
     private $brokersProbability = array();
+    private $serviceLocator = null;
 
     private $queueCountCache = array();
 
@@ -56,6 +59,26 @@ class Broker
         return $total;
     }
 
+    /**
+     * Set service locator
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     */
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->serviceLocator = $serviceLocator;
+    }
+
+    /**
+     * Get service locator
+     *
+     * @return ServiceLocatorInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->serviceLocator;
+    }
+
     final public function addSimpleBroker(AbstractSimpleBroker $broker)
     {
         $this->simpleBrokers[] = $broker;
@@ -93,6 +116,12 @@ class Broker
                 if (isset($this->queueCountCache[$i])) {
                     $this->queueCountCache[$i]['count'] = max($this->queueCountCache[$i]['count']-1, 0);
                 }
+
+                // Service locator injection
+                if ($task instanceof ServiceLocatorAwareInterface) {
+                    $task->setServiceLocator($this->getServiceLocator());
+                }
+
                 return $task;
             }
             $r -= $this->brokersProbability[$i];

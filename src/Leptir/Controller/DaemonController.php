@@ -82,6 +82,7 @@ class DaemonController extends AbstractActionController
 
         $brokersSettings = isset($leptirConfig['brokers']) ? $leptirConfig['brokers'] : array();
         $broker = new Broker($brokersSettings, $loggers);
+        $broker->setServiceLocator($this->serviceLocator);
 
         $daemon = new Daemon($broker, $leptirConfig['daemon'], $loggers, $metaBackend);
         try {
