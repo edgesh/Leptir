@@ -3,6 +3,7 @@
 namespace Leptir\Task;
 
 use Leptir\Exception\LeptirInputException;
+use Leptir\Exception\LeptirTaskException;
 use Leptir\Logger\LeptirLoggerTrait;
 use Leptir\MetaBackend\AbstractMetaBackend;
 use Zend\Stdlib\ArrayUtils;
@@ -78,7 +79,13 @@ abstract class BaseTask
 
         $this->printTaskStartLog();
         @$this->beforeStart();
-        $resp = @$this->doJob();
+        try {
+            $resp = $this->doJob();
+        } catch (\Exception $ex) {
+            $this->addResponseLine('Task exited with exception: ' . $ex->getMessage());
+            $this->logError('Task exited with exception: ' . $ex->getMessage());
+            $resp = self::EXIT_ERROR;
+        }
 
         if ($resp !== self::EXIT_SUCCESS &&
             $resp !== self::EXIT_WARNING &&
@@ -162,7 +169,6 @@ abstract class BaseTask
     {
         $error = error_get_last();
 
-
         if (!is_null($error) && isset($error['message'])) {
             $responseLine = 'Task exited unexpectedly with error message: "' . $error['message'] . '"';
             $this->logError(
@@ -175,9 +181,9 @@ abstract class BaseTask
             $this->taskStatus = self::STATUS_COMPLETED;
 
             $this->saveTaskMetaInfo();
-        } // else alarm signal triggered this method --> ignore
 
-        exit(1);
+            throw new LeptirTaskException(LeptirTaskException::RUNTIME_ERROR_OCCURRED);
+        }
     }
 
     /**
@@ -302,7 +308,8 @@ abstract class BaseTask
         $this->taskStatus = self::STATUS_COMPLETED;
 
         $this->saveTaskMetaInfo();
-        exit(1);
+
+        throw new LeptirTaskException(LeptirTaskException::TIME_LIMIT_EXCEEDED);
     }
 
     private function printTaskStartLog()

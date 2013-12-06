@@ -4,6 +4,8 @@ namespace Leptir\Daemon;
 
 use Leptir\Broker\BrokerTask;
 use Leptir\Exception\DaemonProcessException;
+use Leptir\Exception\LeptirInputException;
+use Leptir\Exception\LeptirTaskException;
 use Leptir\MetaBackend\AbstractMetaBackend;
 
 class DaemonProcess
@@ -57,7 +59,22 @@ class DaemonProcess
             $this->childProcesses[] = new Process($pid);
         } else {
             // child process
-            $task->execute($executionTime, $metaBackend);
+            try {
+                $task->execute($executionTime, $metaBackend);
+            } catch (LeptirTaskException $e) { // time limit exceeded exception
+                switch($e->getCode()) {
+                    case LeptirTaskException::TIME_LIMIT_EXCEEDED:
+                        // TODO this part is usefull
+                        break;
+                    case LeptirTaskException::RUNTIME_ERROR_OCCURRED:
+                        // TODO also pretty usefull
+                        break;
+                    default:
+                        break;
+                }
+            } catch (\Exception $e) {
+                // all the other exceptions
+            }
             exit(1);
         }
     }

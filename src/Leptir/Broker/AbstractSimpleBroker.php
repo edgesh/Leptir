@@ -4,12 +4,44 @@ namespace Leptir\Broker;
 
 abstract class AbstractSimpleBroker
 {
-    protected $priority = 0;
-    protected $TASK_COUNT_CACHING_TIME = 0.2;
-
-    protected $countCacheRefreshed = 0;
+    /**
+     * Variable used to cache number of tasks in current broker.
+     *
+     * @var int
+     */
     protected $cachedCount = 0;
 
+    /**
+     * Variable that holds the last time tasks count was refreshed.
+     * Task count is refreshed every $TASK_COUNT_CACHING_TIME seconds.
+     *
+     * @var int
+     */
+    protected $countCacheRefreshed = 0;
+
+    /**
+     * Priority of current broker
+     *
+     * @var int
+     */
+    protected $priority = 0;
+
+    /**
+     * Settings variable which represents the number of seconds tasks count will be cached.
+     * Increasing this time can reduce number of broker requests.
+     *
+     * @var float
+     */
+    private $TASK_COUNT_CACHING_TIME = 0.2;
+
+    /**
+     * Default constructor.
+     * Available parameters:
+     *      * priority - priority of current broker
+     *      * task_count_caching_time - explained for $TASK_COUNT_CACHING_TIME
+     *
+     * @param array $config
+     */
     public function __construct(array $config = array())
     {
         if (isset($config['configuration']['priority'])) {
@@ -20,6 +52,12 @@ abstract class AbstractSimpleBroker
         }
     }
 
+    /**
+     * Method that handles inserting a new task into broker queue.
+     *
+     * @param BrokerTask $task
+     * @return mixed
+     */
     abstract public function pushBrokerTask(BrokerTask $task);
 
     /**
@@ -28,6 +66,14 @@ abstract class AbstractSimpleBroker
      * @return BrokerTask
      */
     abstract public function popBrokerTask();
+
+    /**
+     * Retrieve number of tasks from broker. This method doesn't need to do caching.
+     * Caching is done in Broker class.
+     *
+     * @return int
+     */
+    abstract protected function tasksCount();
 
     /**
      * Method that returns number of un-processed tasks.
@@ -44,8 +90,23 @@ abstract class AbstractSimpleBroker
         return $this->cachedCount;
     }
 
-    abstract protected function tasksCount();
+    /**
+     * Broker priority getter.
+     *
+     * @return int
+     */
+    final public function getPriority()
+    {
+        return $this->priority;
+    }
 
+    final public function increaseCachedCount($value) {
+        $this->cachedCount += $value;
+    }
+
+    final public function decreaseCachedCount($value) {
+        $this->cachedCount = max($this->cachedCount - $value, 0);
+    }
 
     /**
      * Converts DateTime into relative delay (seconds remaining until the execution)
@@ -65,8 +126,12 @@ abstract class AbstractSimpleBroker
         return max(-1, $timeStamp - $timeStampNow);
     }
 
-
-
+    /**
+     * Retrieve unix timestamp from DateTime. Also handles null values.
+     *
+     * @param \DateTime $time
+     * @return int
+     */
     protected function getTimeStampForDate(\DateTime $time = null)
     {
         if (!($time instanceof \DateTime)) {
@@ -74,10 +139,5 @@ abstract class AbstractSimpleBroker
         }
         $score = intval($time->format('U'));
         return $score;
-    }
-
-    final public function getPriority()
-    {
-        return $this->priority;
     }
 }

@@ -9,13 +9,37 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 
 class Broker implements ServiceLocatorAwareInterface
 {
+    /**
+     * Logging is enabled from this class.
+     * Available methods:
+     *  * logInfo
+     *  * logError
+     *  * logWarning
+     *  * logDebug
+     */
     use LeptirLoggerTrait;
 
-    private $simpleBrokers = array();
-    private $brokersProbability = array();
-    private $serviceLocator = null;
+    /**
+     * List of simple brokers.
+     *
+     * @var AbstractSimpleBroker[]
+     */
+    protected $simpleBrokers = array();
 
-    private $queueCountCache = array();
+    /**
+     * Probability for each broker to be chosen for next task. Broker priority affects the
+     * probability.
+     *
+     * @var float[]
+     */
+    protected $brokersProbability = array();
+
+    /**
+     * Service manager to be injected into tasks if they implements ServiceLocatorAwareInterface
+     *
+     * @var null
+     */
+    protected $serviceLocator = null;
 
     public function __construct(array $config = array(), $loggers = array())
     {
@@ -34,7 +58,9 @@ class Broker implements ServiceLocatorAwareInterface
     }
 
     /**
-     * Fetch number of tasks from all the brokers
+     * Total number of tasks from all the brokers.
+     *
+     * @returns int
      */
     final public function getTotalNumberOfTasks()
     {
@@ -90,6 +116,26 @@ class Broker implements ServiceLocatorAwareInterface
      */
     public function getOneTask()
     {
+        $broker = $this->getBrokerForNextTask();
+        $task = $broker->popBrokerTask();
+        if ($task) {
+            $broker->decreaseCachedCount(1);
+        }
+
+        // Service locator injection
+        if ($task && $task->getTask() instanceof ServiceLocatorAwareInterface) {
+            $task->injectServiceLocator($this->getServiceLocator());
+        }
+        return $task;
+    }
+
+    /**
+     * Determine the broker for next task respecting the probabilities
+     *
+     * @return AbstractSimpleBroker|null
+     */
+    protected function getBrokerForNextTask()
+    {
         $r = 1.0 * mt_rand() / mt_getrandmax();
         $numberOfBrokers = count($this->simpleBrokers);
 
@@ -99,7 +145,6 @@ class Broker implements ServiceLocatorAwareInterface
             if ($this->getTasksCountForQueue($i) === 0) {
                 $totalProbability -= $this->brokersProbability[$i];
             }
-
         }
 
         $r *= $totalProbability;
@@ -112,23 +157,16 @@ class Broker implements ServiceLocatorAwareInterface
             }
 
             if ($r <= $this->brokersProbability[$i]) {
-                $task = $broker->popBrokerTask();
-                if (isset($this->queueCountCache[$i])) {
-                    $this->queueCountCache[$i]['count'] = max($this->queueCountCache[$i]['count']-1, 0);
-                }
-
-                // Service locator injection
-                if ($task && $task->getTask() instanceof ServiceLocatorAwareInterface) {
-                    $task->injectServiceLocator($this->getServiceLocator());
-                }
-
-                return $task;
+                return $broker;
             }
             $r -= $this->brokersProbability[$i];
         }
         return null;
     }
 
+    /**
+     * Sort brokers by priority
+     */
     private function sortBrokersByPriority()
     {
         usort(
@@ -143,6 +181,10 @@ class Broker implements ServiceLocatorAwareInterface
         );
     }
 
+    /**
+     * Selection similar to rank selection in genetic algorithm.
+     *
+     */
     private function calculateBrokerProbabilities()
     {
         $this->sortBrokersByPriority();
@@ -195,6 +237,11 @@ class Broker implements ServiceLocatorAwareInterface
         );
     }
 
+    final public function getNumberOfSimpleBrokers()
+    {
+        return count($this->simpleBrokers);
+    }
+
     /**
      * Helper method to generate unique string id
      *
@@ -224,7 +271,9 @@ class Broker implements ServiceLocatorAwareInterface
                 return $broker;
             }
         }
-        return count($this->simpleBrokers) ? $this->simpleBrokers[0] : null;
+        return count($this->simpleBrokers) ?
+            $this->simpleBrokers[count($this->simpleBrokers)-1] :
+            null;
     }
 
     final private function getTasksCountForQueue($index)

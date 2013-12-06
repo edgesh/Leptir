@@ -1,6 +1,7 @@
 <?php
 namespace LeptirTest;
 
+use Zend\Loader\AutoloaderFactory;
 use Zend\Mvc\Service\ServiceManagerConfig;
 use Zend\ServiceManager\ServiceManager;
 
@@ -20,6 +21,19 @@ class TestConfiguration
 
         static::$serviceManager = $serviceManager;
         static::$config = $testConfig;
+
+
+        AutoloaderFactory::factory(
+            array(
+                'Zend\Loader\StandardAutoloader' => array(
+                    'autoregister_zf' => true,
+                    'namespaces' => array(
+                        __NAMESPACE__ => __DIR__ . '/' . __NAMESPACE__
+                    ),
+                ),
+            )
+        );
+
     }
 
     public static function getServiceManager()
