@@ -1,0 +1,42 @@
+#!/bin/bash
+PID_PATH='{{PID_PATH}}'
+
+case "$1" in
+start)
+	# check if PID file exists
+	if [ -f /var/run/leptir.pid ]; then
+		#check if process is actually activea
+		pid="`cat $PID_PATH`"
+		if ps $pid > /dev/null
+		then
+			echo -e "\e[31mLeptir is already flying on this box.\e[0m"
+			exit 1
+		else
+			echo -e "\e[33m.pid file is there, but process is not running. Cleaning .pid file and starting the process.\e[0m"
+			rm -f "$PID_PATH"
+		fi
+	fi
+	echo -e "\e[32mStarting a little butterfly. Fly buddy, fly!\e[0m"
+    {{PHP_PATH}}php {{ROOT_PATH}}index.php leptir daemon start  --config={{CONFIG_PATH}} >& /dev/null &
+;;
+stop)
+    echo -ne "Stopping a little butterfly. You'll have to wait for all the tasks to finish though.\n"
+	{{PHP_PATH}}php {{ROOT_PATH}}index.php leptir daemon stop >& /dev/null &
+	while [ -f $PID_PATH ];
+	do
+		sleep 1
+		echo -ne "."
+	done
+	echo
+;;
+restart)
+    echo "Restarting a little butterfly. You'll have to wait for all the tasks to finish before that action."
+    {{PHP_PATH}}php {{ROOT_PATH}}index.php leptir daemon restart  --config={{CONFIG_PATH}} >& /dev/null &
+;;
+*)
+    echo "Usage: $0 (start|stop|restart)"
+    exit 1
+esac
+
+exit 0
+
