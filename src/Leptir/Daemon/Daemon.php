@@ -17,10 +17,10 @@ class Daemon
 {
     use LeptirLoggerTrait;
 
-    private $EMPTY_QUEUE_SLEEP_TIME;
-    private $WORKERS_ACTIVE_SLEEP_TIME;
-    private $NUMBER_OF_WORKERS;
-    private $TASK_EXECUTION_TIME;
+    private $configEmptyQueueSleepTime;
+    private $configAllWorkersActiveSleepTime;
+    private $configNumberOfWorkers;
+    private $configTaskExecutionTime;
 
     private $daemonProcess;
     private $isRunning = true;
@@ -47,10 +47,10 @@ class Daemon
 
         $configuration = $daemonConfig['configuration'];
 
-        $this->EMPTY_QUEUE_SLEEP_TIME = $this->secondsToMicroseconds($configuration['empty_queue_sleep_time']);
-        $this->WORKERS_ACTIVE_SLEEP_TIME = $this->secondsToMicroseconds($configuration['workers_active_sleep_time']);
-        $this->NUMBER_OF_WORKERS = $configuration['number_of_workers'];
-        $this->TASK_EXECUTION_TIME = $configuration['task_execution_time'];
+        $this->configEmptyQueueSleepTime = $this->secondsToMicroseconds($configuration['empty_queue_sleep_time']);
+        $this->configAllWorkersActiveSleepTime = $this->secondsToMicroseconds($configuration['workers_active_sleep_time']);
+        $this->configNumberOfWorkers = $configuration['number_of_workers'];
+        $this->configTaskExecutionTime = $configuration['task_execution_time'];
 
         // ticks
         declare(
@@ -73,17 +73,17 @@ class Daemon
     private function run()
     {
         while ($this->isRunning) {
-            if ($this->daemonProcess->activeChildrenCount() >= $this->NUMBER_OF_WORKERS) {
-                if ($this->WORKERS_ACTIVE_SLEEP_TIME) {
-                    usleep($this->WORKERS_ACTIVE_SLEEP_TIME);
+            if ($this->daemonProcess->activeChildrenCount() >= $this->configNumberOfWorkers) {
+                if ($this->configAllWorkersActiveSleepTime) {
+                    usleep($this->configAllWorkersActiveSleepTime);
                 }
             } else {
-                $queueSize = $this->broker->getBoundedNumberOfTasks($this->NUMBER_OF_WORKERS);
+                $queueSize = $this->broker->getBoundedNumberOfTasks($this->configNumberOfWorkers);
 
                 if ($queueSize) {
                     $numberToSpawn = min(
                         $queueSize,
-                        $this->NUMBER_OF_WORKERS -
+                        $this->configNumberOfWorkers -
                         $this->daemonProcess->activeChildrenCount()
                     );
 
@@ -94,14 +94,14 @@ class Daemon
                             $task->subscribeLoggers($this->loggers);
                             $this->daemonProcess->createProcessForTask(
                                 $task,
-                                $this->TASK_EXECUTION_TIME,
+                                $this->configTaskExecutionTime,
                                 $this->metaBackend
                             );
                         }
                     }
                 } else {
-                    if ($this->EMPTY_QUEUE_SLEEP_TIME > 0) {
-                        usleep($this->EMPTY_QUEUE_SLEEP_TIME);
+                    if ($this->configEmptyQueueSleepTime > 0) {
+                        usleep($this->configEmptyQueueSleepTime);
                     }
                 }
             }
@@ -111,8 +111,14 @@ class Daemon
         $this->logInfo(
             "Somebody stopped a little butterfly. He's gonna wait for all the children to finish."
         );
-
-        $this->daemonProcess->waitForProcessesToFinish();
+        if ($this->daemonProcess->activeChildrenCount()) {
+            $this->daemonProcess->waitForProcessesToFinish();
+        } else {
+            $this->logInfo(
+                "There's no active children. Let's just land on the hard surface"
+            );
+        }
+        $this->logInfo("All good. I'm out for now.");
     }
 
     public function stopDaemon()

@@ -76,6 +76,7 @@ class SQSBroker extends AbstractSimpleBroker
 
     /**
      * @param BrokerTask $task
+     * @return mixed|void
      */
     public function pushBrokerTask(BrokerTask $task)
     {

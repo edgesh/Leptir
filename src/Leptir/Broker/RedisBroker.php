@@ -37,9 +37,8 @@ class RedisBroker extends AbstractSimpleBroker
     }
 
     /**
-     * Send a new task to the broker
-     *
      * @param BrokerTask $task
+     * @return mixed|void
      */
     public function pushBrokerTask(BrokerTask $task)
     {

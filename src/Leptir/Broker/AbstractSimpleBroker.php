@@ -32,7 +32,7 @@ abstract class AbstractSimpleBroker
      *
      * @var float
      */
-    private $TASK_COUNT_CACHING_TIME = 0.2;
+    private $taskCountCachingTime = 0.2;
 
     /**
      * Default constructor.
@@ -48,7 +48,7 @@ abstract class AbstractSimpleBroker
             $this->priority = $config['configuration']['priority'];
         }
         if (isset($config['configuration']['task_count_caching_time'])) {
-            $this->TASK_COUNT_CACHING_TIME = $config['configuration']['task_count_caching_time'];
+            $this->taskCountCachingTime = $config['configuration']['task_count_caching_time'];
         }
     }
 
@@ -82,7 +82,7 @@ abstract class AbstractSimpleBroker
      */
     final public function getTasksCount()
     {
-        if (microtime(true) - $this->countCacheRefreshed > $this->TASK_COUNT_CACHING_TIME) {
+        if (microtime(true) - $this->countCacheRefreshed > $this->taskCountCachingTime) {
             $this->cachedCount = $this->tasksCount();
             $this->countCacheRefreshed = microtime();
         }
@@ -100,10 +100,20 @@ abstract class AbstractSimpleBroker
         return $this->priority;
     }
 
+    /**
+     * Increase approximate cached count
+     *
+     * @param int $value
+     */
     final public function increaseCachedCount($value) {
         $this->cachedCount += $value;
     }
 
+    /**
+     * Decrease approximate cached count
+     *
+     * @param int $value
+     */
     final public function decreaseCachedCount($value) {
         $this->cachedCount = max($this->cachedCount - $value, 0);
     }
@@ -137,7 +147,6 @@ abstract class AbstractSimpleBroker
         if (!($time instanceof \DateTime)) {
             $time = new \DateTime();
         }
-        $score = intval($time->format('U'));
-        return $score;
+        return intval($time->format('U'));
     }
 }

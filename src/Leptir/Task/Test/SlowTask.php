@@ -15,7 +15,7 @@ class SlowTask extends BaseTask
 {
     protected function doJob()
     {
-        $sleepTime = rand(6, 19);
+        $sleepTime = rand(30, 50);
         $this->logInfo('Sleeping for '. $sleepTime);
         sleep($sleepTime);
 

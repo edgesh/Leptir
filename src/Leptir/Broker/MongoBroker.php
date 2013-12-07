@@ -22,6 +22,19 @@ class MongoBroker extends AbstractSimpleBroker
      */
     private $mongoConnection = null;
 
+
+    /**
+     * Configuration:
+     *  * connection
+     *      * host - host URI
+     *      * port
+     *      * database - database name
+     *      * collection - collection name
+     *      * options - additional connection options (secondaryPreferred, connect, ...) see MongoClient documentation
+     *
+     *
+     * @param array $config
+     */
     public function __construct(array $config = array())
     {
         parent::__construct($config);
@@ -46,6 +59,12 @@ class MongoBroker extends AbstractSimpleBroker
         $this->mongoConnection = $dbConnection->$collection;
     }
 
+    /**
+     * Insert one task into broker. Task has to be wrapped in BrokerTask decorator.
+     *
+     * @param BrokerTask $brokerTask
+     * @return mixed|void
+     */
     public function pushBrokerTask(BrokerTask $brokerTask)
     {
         $arrayCopy = $brokerTask->getArrayCopy();
@@ -127,12 +146,23 @@ class MongoBroker extends AbstractSimpleBroker
         return $object;
     }
 
+    /**
+     * Generate unique id with date information for custom date.
+     *
+     * @param \DateTime $time
+     * @return string
+     */
     private function getIdForDate(\DateTime $time = null)
     {
         $timestamp = $this->getTimeStampForDate($time);
         return sprintf('%08x%.8F', $timestamp, lcg_value());
     }
 
+    /**
+     * Return unique id for current time.
+     *
+     * @return string
+     */
     private function getCurrentId()
     {
         $now = new \DateTime();

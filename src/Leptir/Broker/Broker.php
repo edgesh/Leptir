@@ -72,6 +72,13 @@ class Broker implements ServiceLocatorAwareInterface
         return $total;
     }
 
+    /**
+     * Method returns bounded value of available tasks. It doesn't ask all the brokers if
+     * it's not necessary.
+     *
+     * @param int $bound
+     * @return int
+     */
     final public function getBoundedNumberOfTasks($bound)
     {
         $total = 0;
@@ -276,6 +283,12 @@ class Broker implements ServiceLocatorAwareInterface
             null;
     }
 
+    /**
+     * Fetch number of tasks in broker with index $index.
+     *
+     * @param $index
+     * @return int
+     */
     final private function getTasksCountForQueue($index)
     {
         $broker = isset($this->simpleBrokers[$index]) ? $this->simpleBrokers[$index] : null;

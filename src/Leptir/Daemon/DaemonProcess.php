@@ -26,6 +26,18 @@ class DaemonProcess
         return $this->processIsRunning();
     }
 
+    public function setUp()
+    {
+        if (!$this->isActive()) {
+            $this->deletePID();
+        }
+    }
+
+    public function cleanUp()
+    {
+        $this->deletePID();
+    }
+
     public function waitForProcessesToFinish()
     {
         while (!empty($this->childProcesses)) {
@@ -109,7 +121,9 @@ class DaemonProcess
 
     private function deletePID()
     {
-        unlink($this->getPIDFilename());
+        if (file_exists($this->getPIDFilename())) {
+            unlink($this->getPIDFilename());
+        }
     }
 
     private function getStillActiveChildren()

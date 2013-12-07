@@ -159,20 +159,35 @@ class BrokerTask
         $this->getTask()->subscribeLogger($logger);
     }
 
+    /**
+     * Injecting list of loggers into the task
+     *
+     * @param array $loggers
+     */
     final public function subscribeLoggers(array $loggers)
     {
         $this->getTask()->subscribeLoggers($loggers);
     }
 
+    /**
+     * Fetch return code from task.
+     *
+     * @return int
+     */
     final public function getTaskReturnCode()
     {
         return $this->task->getReturnCode();
     }
 
+    /**
+     * Injecting service manager into the task
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     */
     final public function injectServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
-        if ($this->task instanceof ServiceLocatorAwareInterface) {
-            $this->task->setServiceLocator($serviceLocator);
+        if ($this->getTask() instanceof ServiceLocatorAwareInterface) {
+            $this->getTask()->setServiceLocator($serviceLocator);
         }
     }
 }
