@@ -2,11 +2,11 @@
 
 namespace LeptirTest\Mocks;
 
-use Leptir\Task\BaseTask;
+use Leptir\Task\AbstractLeptirTask;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class MockTask extends BaseTask implements ServiceLocatorAwareInterface
+class MockTask extends AbstractLeptirTask implements ServiceLocatorAwareInterface
 {
     private $serviceManager = null;
 

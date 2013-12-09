@@ -2,9 +2,9 @@
 
 namespace LeptirTest\Mocks;
 
-use Leptir\Task\BaseTask;
+use Leptir\Task\AbstractLeptirTask;
 
-class MockPHPErrorTask extends BaseTask
+class MockPHPErrorTask extends AbstractLeptirTask
 {
     /**
      * Main logic of the task. This method has to be implemented for every task.

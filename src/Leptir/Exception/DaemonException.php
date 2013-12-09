@@ -2,7 +2,7 @@
 
 namespace Leptir\Exception;
 
-class DaemonException extends LeptirBaseException
+class DaemonException extends AbstractLeptirException
 {
     const DAEMON_ALREADY_RUNNING = 1;
 

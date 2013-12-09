@@ -34,10 +34,6 @@ class MongoMetaBackend extends AbstractMetaBackend
         $hostConnection = new \MongoClient('mongodb://' . $host . ':' . (string)$port, $options);
         $dbConnection = $hostConnection->$database;
         $this->mongoConnection = $dbConnection->$collection;
-
-        /**
-         * Configuration parameters processing goes here
-         */
     }
 
     public function saveMetaInfo(\ArrayObject $object)

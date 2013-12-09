@@ -2,9 +2,8 @@
 
 namespace Leptir\Daemon;
 
-
 /**
- * Process descriptor
+ * process descriptor using pcntl functions
  *
  * Class Process
  * @package Leptir\Daemon
@@ -14,9 +13,13 @@ class Process
     private $pid;
     private $processFinished = false;
 
-    public function __construct($pid)
+    public function __construct($pid = -1)
     {
-        $this->pid = $pid;
+        if ($pid > 0) {
+            $this->pid = $pid;
+        } else {
+            $this->pid = getmypid();
+        }
         $this->processFinished = false;
     }
 
@@ -59,5 +62,18 @@ class Process
             return true;
         }
         return false;
+    }
+
+    protected function setPriority($priority)
+    {
+        if ($this->getPID()) {
+            return pcntl_setpriority($priority, $this->getPID());
+        }
+        return false;
+    }
+
+    protected function getPriority()
+    {
+        return pcntl_getpriority($this->getPID());
     }
 }

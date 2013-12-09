@@ -2,7 +2,7 @@
 
 namespace Leptir\Task\Test;
 
-use Leptir\Task\BaseTask;
+use Leptir\Task\AbstractLeptirTask;
 
 /**
  * Simple task used for testing purpose. This task will not anything smart, it will just sleep for
@@ -11,7 +11,7 @@ use Leptir\Task\BaseTask;
  * Class SlowTask
  * @package Leptir\Task\Test
  */
-class SlowTask extends BaseTask
+class SlowTask extends AbstractLeptirTask
 {
     protected function doJob()
     {

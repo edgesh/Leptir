@@ -2,7 +2,7 @@
 
 namespace Leptir\Exception;
 
-class LeptirInputException extends LeptirBaseException
+class LeptirInputException extends AbstractLeptirException
 {
     const NOT_AN_INT = 1;
     const NOT_A_STRING = 2;

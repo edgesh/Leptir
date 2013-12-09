@@ -46,8 +46,9 @@ class Module implements
     {
         return array(
             'Leptir - background task processor',
-            'Usages',
-            'index.php leptir daemon start|stop|restart [--configuration config_file.ext]',
+            'Usage:',
+            'index.php leptir start [--config config_file.php] [--daemon]',
+            'index.php leptir stop',
             'index.php leptir tester <action> <taskName>'
         );
     }

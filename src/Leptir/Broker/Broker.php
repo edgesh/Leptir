@@ -3,7 +3,7 @@
 namespace Leptir\Broker;
 
 use Leptir\Logger\LeptirLoggerTrait;
-use Leptir\Task\BaseTask;
+use Leptir\Task\AbstractLeptirTask;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -47,7 +47,7 @@ class Broker implements ServiceLocatorAwareInterface
 
         foreach ($config as $brokerSetting) {
             try {
-                $broker = BrokerFactory::factory($brokerSetting);
+                $broker = SimpleBrokerFactory::factory($brokerSetting);
             } catch (\Exception $e) {
                 $this->logError("Broker can't be initialized. " . $e->getMessage());
                 continue;
@@ -229,7 +229,7 @@ class Broker implements ServiceLocatorAwareInterface
         }
     }
 
-    final public function pushTask(BaseTask $task, \DateTime $timeOfExecution = null, $priority = 0)
+    final public function pushTask(AbstractLeptirTask $task, \DateTime $timeOfExecution = null, $priority = 0)
     {
         $taskId = $this->generateUniqueId();
         $task->setTaskId($taskId);

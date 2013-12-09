@@ -15,7 +15,7 @@ namespace Leptir\Task;
 interface RevertibleTaskInterface
 {
     /**
-     * @return BaseTask
+     * @return AbstractLeptirTask
      */
     public function createRevertTask();
 }

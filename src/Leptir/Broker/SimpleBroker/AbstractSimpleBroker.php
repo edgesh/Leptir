@@ -1,6 +1,6 @@
 <?php
 
-namespace Leptir\Broker;
+namespace Leptir\Broker\SimpleBroker;
 
 abstract class AbstractSimpleBroker
 {

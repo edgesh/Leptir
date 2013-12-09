@@ -6,10 +6,13 @@ use Leptir\Broker\BrokerTask;
 use Leptir\Exception\DaemonProcessException;
 use Leptir\Exception\LeptirInputException;
 use Leptir\Exception\LeptirTaskException;
+use Leptir\Logger\LeptirLoggerTrait;
 use Leptir\MetaBackend\AbstractMetaBackend;
 
 class DaemonProcess
 {
+    use LeptirLoggerTrait;
+
     const PID_FILE = '/var/run/leptir.pid';
 
     private $pid;

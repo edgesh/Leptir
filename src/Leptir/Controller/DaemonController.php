@@ -3,7 +3,6 @@
 namespace Leptir\Controller;
 
 use Leptir\Daemon\DaemonProcess;
-use Leptir\Exception\DaemonProcessException;
 use Zend\Console\Request;
 
 class DaemonController extends BaseLeptirController
@@ -26,12 +25,27 @@ class DaemonController extends BaseLeptirController
             throw new \RuntimeException('You can only use this action from a console.');
         }
 
+        $isDaemon = $request->getParam('daemon');
+
         $daemon = $this->getDaemon();
 
-        try {
-            $daemon->start();
-        } catch (\Exception $e) {
-            $this->writeErrorLine($e->getMessage());
+        if (!$isDaemon) {
+            try {
+                $daemon->start();
+            } catch (\Exception $e) {
+                $this->writeErrorLine($e->getMessage());
+            }
+        } else {
+            $pid = pcntl_fork();
+
+            if ($pid == -1) {
+                $this->writeErrorLine('Foking daemon process failed. Exiting ...');
+                exit(1);
+            } elseif ($pid == 0) {
+                // child process which will be a daemon
+                posix_setsid();
+                $daemon->start();
+            }
         }
     }
 

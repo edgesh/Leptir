@@ -17,11 +17,11 @@ start)
 		fi
 	fi
 	echo -e "\e[32mStarting a little butterfly. Fly buddy, fly!\e[0m"
-    {{PHP_PATH}}php {{ROOT_PATH}}index.php leptir daemon start  --config={{CONFIG_PATH}} >& /dev/null &
+    {{PHP_PATH}}php {{ROOT_PATH}}index.php leptir start  --config={{CONFIG_PATH}} --daemon
 ;;
 stop)
     echo -ne "Stopping a little butterfly. You'll have to wait for all the tasks to finish though.\n"
-	{{PHP_PATH}}php {{ROOT_PATH}}index.php leptir daemon stop >& /dev/null &
+	{{PHP_PATH}}php {{ROOT_PATH}}index.php leptir stop
 	while [ -f $PID_PATH ];
 	do
 		sleep 1
@@ -29,12 +29,8 @@ stop)
 	done
 	echo
 ;;
-restart)
-    echo "Restarting a little butterfly. You'll have to wait for all the tasks to finish before that action."
-    {{PHP_PATH}}php {{ROOT_PATH}}index.php leptir daemon restart  --config={{CONFIG_PATH}} >& /dev/null &
-;;
 *)
-    echo "Usage: $0 (start|stop|restart)"
+    echo "Usage: $0 (start|stop)"
     exit 1
 esac
 

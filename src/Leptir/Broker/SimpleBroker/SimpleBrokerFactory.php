@@ -1,10 +1,10 @@
 <?php
 
-namespace Leptir\Broker;
+namespace Leptir\Broker\SimpleBroker;
 
 use Leptir\Exception\BrokerFactoryException;
 
-class BrokerFactory
+class SimpleBrokerFactory
 {
     const BROKER_SQS = 'sqs';
     const BROKER_MONGO = 'mongodb';
@@ -15,7 +15,7 @@ class BrokerFactory
      * Factory for creating all supported brokers.
      *
      * @param array $config
-     * @return MongoBroker|RedisBroker|SQSBroker
+     * @return MongoSimpleBroker|RedisSimpleBroker|SQSSimpleBroker
      * @throws \Leptir\Exception\BrokerFactoryException
      */
     public static function factory(array $config)
@@ -28,11 +28,11 @@ class BrokerFactory
         switch($brokerType)
         {
             case self::BROKER_SQS:
-                return new SQSBroker($config);
+                return new SQSSimpleBroker($config);
             case self::BROKER_MONGO:
-                return new MongoBroker($config);
+                return new MongoSimpleBroker($config);
             case self::BROKER_REDIS:
-                return new RedisBroker($config);
+                return new RedisSimpleBroker($config);
             default:
                 throw new BrokerFactoryException(BrokerFactoryException::BROKER_NOT_SUPPORTED);
         }

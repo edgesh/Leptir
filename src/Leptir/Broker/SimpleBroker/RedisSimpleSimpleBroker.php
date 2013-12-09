@@ -1,6 +1,6 @@
 <?php
 
-namespace Leptir\Broker;
+namespace Leptir\Broker\SimpleBroker;
 
 use Predis\Client;
 
@@ -9,7 +9,7 @@ use Predis\Client;
  * @package Leptir\Broker
  */
 
-class RedisBroker extends AbstractSimpleBroker
+class RedisSimpleBroker extends AbstractSimpleBroker
 {
     private $redisClient = null;
     private $key = 'leptir:ztasks';

@@ -2,7 +2,7 @@
 
 namespace Leptir\Task\Test;
 
-use Leptir\Task\BaseTask;
+use Leptir\Task\AbstractLeptirTask;
 
 /**
  * Awesome testing task which will log message parameter.
@@ -10,7 +10,7 @@ use Leptir\Task\BaseTask;
  * Class TestTask
  * @package Leptir\Task\Test
  */
-class TestTask extends BaseTask
+class TestTask extends AbstractLeptirTask
 {
     protected function doJob()
     {

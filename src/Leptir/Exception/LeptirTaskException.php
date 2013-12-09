@@ -2,7 +2,7 @@
 
 namespace Leptir\Exception;
 
-class LeptirTaskException extends LeptirBaseException
+class LeptirTaskException extends AbstractLeptirException
 {
     const TIME_LIMIT_EXCEEDED = 1;
     const RUNTIME_ERROR_OCCURRED = 2;

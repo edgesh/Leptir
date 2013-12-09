@@ -2,7 +2,7 @@
 
 namespace Leptir\Exception;
 
-class DaemonProcessException extends LeptirBaseException
+class DaemonProcessException extends AbstractLeptirException
 {
     const UNABLE_TO_ACCESS_PID_FILE = 1;
 

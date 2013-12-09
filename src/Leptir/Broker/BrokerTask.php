@@ -3,7 +3,7 @@
 namespace Leptir\Broker;
 
 use Leptir\MetaBackend\AbstractMetaBackend;
-use Leptir\Task\BaseTask;
+use Leptir\Task\AbstractLeptirTask;
 use Zend\Log\Logger;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -27,7 +27,7 @@ class BrokerTask
     /**
      * Task being decorated.
      *
-     * @var BaseTask|null $task
+     * @var AbstractLeptirTask|null $task
      */
     private $task = null;
 
@@ -45,7 +45,7 @@ class BrokerTask
      */
     private $timeOfExecution = null;
 
-    public function __construct(BaseTask $task, $priority = -1, \DateTime $timeOfExecution = null)
+    public function __construct(AbstractLeptirTask $task, $priority = -1, \DateTime $timeOfExecution = null)
     {
         $this->task = $task;
         $this->priority = $priority;
@@ -72,7 +72,7 @@ class BrokerTask
         }
 
         if (class_exists($className)) {
-            /** @var BaseTask $task */
+            /** @var AbstractLeptirTask $task */
             $task = new $className();
             $task->exchangeArray($taskData);
         } else {
@@ -142,7 +142,7 @@ class BrokerTask
     /**
      * Get task to execute (instanceof Leptir\Task\BaseTask)
      *
-     * @return BaseTask|null
+     * @return AbstractLeptirTask|null
      */
     final public function getTask()
     {

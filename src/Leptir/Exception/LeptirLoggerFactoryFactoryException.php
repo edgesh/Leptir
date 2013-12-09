@@ -2,7 +2,7 @@
 
 namespace Leptir\Exception;
 
-class LeptirLoggerFactoryException extends LeptirBaseException
+class LeptirLoggerFactoryException extends AbstractLeptirException
 {
     const FILE_PATH_NOT_DEFINED = 1;
     const LOGGER_TYPE_NOT_DEFINED = 2;

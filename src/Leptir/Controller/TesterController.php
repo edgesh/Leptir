@@ -3,11 +3,12 @@
 namespace Leptir\Controller;
 
 use Leptir\Broker\Broker;
+use Leptir\Task\Test\SlowTask;
 use Leptir\Task\Test\TestTask;
 use Zend\Console\Request;
 use Zend\Mvc\Controller\AbstractActionController;
 
-class TesterController extends AbstractActionController
+class TesterController extends BaseLeptirController
 {
     public function pushAction()
     {
@@ -17,12 +18,8 @@ class TesterController extends AbstractActionController
             throw new \RuntimeException('You can only use this action from a console.');
         }
 
-        $serviceConfig = $this->serviceLocator->get('config');
-        $leptirConfig = isset($serviceConfig['leptir']) ? $serviceConfig['leptir'] : array();
-
         $taskName = $request->getParam('taskName');
-
-        $broker = new Broker($leptirConfig['brokers']);
+        $broker = $this->getBroker();
 
         switch($taskName)
         {
@@ -42,6 +39,12 @@ class TesterController extends AbstractActionController
                         $broker->pushTask($task, null, 1);
                     }
                 }
+                break;
+            case 'slow':
+                $task = new SlowTask();
+                $broker->pushTask($task);
+                $task = new SlowTask();
+                $broker->pushTask($task);
                 break;
         }
     }

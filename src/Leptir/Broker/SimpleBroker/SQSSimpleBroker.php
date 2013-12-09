@@ -1,12 +1,12 @@
 <?php
 
-namespace Leptir\Broker;
+namespace Leptir\Broker\SimpleBroker;
 
 use Leptir\Exception\SQSBrokerException;
 use Leptir\Helper\SQSQueue;
-use Leptir\Task\BaseTask;
+use Leptir\Task\AbstractLeptirTask;
 
-class SQSBroker extends AbstractSimpleBroker
+class SQSSimpleBroker extends AbstractSimpleBroker
 {
     const DELAYED_TASK_INSERT_TIME = 6;
 
@@ -52,7 +52,7 @@ class SQSBroker extends AbstractSimpleBroker
     /**
      * Receive one task from the consumer
      *
-     * @return BaseTask
+     * @return AbstractLeptirTask
      */
     private function receiveMessage()
     {

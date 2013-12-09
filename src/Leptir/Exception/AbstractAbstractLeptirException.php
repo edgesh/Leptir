@@ -2,7 +2,7 @@
 
 namespace Leptir\Exception;
 
-abstract class LeptirBaseException extends \Exception
+abstract class AbstractLeptirException extends \Exception
 {
     public function __construct($code)
     {

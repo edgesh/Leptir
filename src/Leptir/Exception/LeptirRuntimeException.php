@@ -2,7 +2,7 @@
 
 namespace Leptir\Exception;
 
-class LeptirRuntimeException extends LeptirBaseException
+class LeptirRuntimeException extends AbstractLeptirException
 {
     const CONFIGURATION_FILE_INVALID = 1;
 

@@ -2,7 +2,7 @@
 
 namespace Leptir\Exception;
 
-class MongoBrokerException extends LeptirBaseException
+class MongoBrokerException extends AbstractLeptirException
 {
     protected function getMessageForCode($code)
     {

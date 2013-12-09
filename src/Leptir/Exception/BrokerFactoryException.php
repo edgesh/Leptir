@@ -2,7 +2,7 @@
 
 namespace Leptir\Exception;
 
-class BrokerFactoryException extends LeptirBaseException
+class BrokerFactoryException extends AbstractLeptirException
 {
     const BROKER_CONFIG_INVALID = 1;
     const BROKER_NOT_SUPPORTED = 2;

@@ -8,7 +8,7 @@ use Leptir\Logger\LeptirLoggerTrait;
 use Leptir\MetaBackend\AbstractMetaBackend;
 use Zend\Stdlib\ArrayUtils;
 
-abstract class BaseTask
+abstract class AbstractLeptirTask
 {
     use LeptirLoggerTrait;
 
@@ -42,6 +42,11 @@ abstract class BaseTask
     {
         $this->returnCode = self::EXIT_UNKNOWN;
         $this->parameters = $parameters;
+    }
+
+    public function prepareForExecution()
+    {
+
     }
 
     /**
@@ -78,6 +83,7 @@ abstract class BaseTask
         );
 
         $this->printTaskStartLog();
+
         @$this->beforeStart();
         try {
             $resp = $this->doJob();
@@ -177,7 +183,7 @@ abstract class BaseTask
             $this->responseLines = array(
                 $responseLine
             );
-            $this->returnCode = BaseTask::EXIT_ERROR;
+            $this->returnCode = AbstractLeptirTask::EXIT_ERROR;
             $this->taskStatus = self::STATUS_COMPLETED;
 
             $this->saveTaskMetaInfo();
@@ -231,7 +237,6 @@ abstract class BaseTask
         }
         throw new LeptirInputException($paramName, LeptirInputException::VALUE_NOT_DEFINED);
     }
-
 
     /**
      * @param string $paramName
@@ -292,8 +297,6 @@ abstract class BaseTask
         return $defaultValue;
     }
 
-
-
     final public function __alarmHandler()
     {
         $this->logInfo('Task execution time exceeded.');
@@ -301,7 +304,7 @@ abstract class BaseTask
 
         $this->printTaskEndLog();
 
-        $this->returnCode = BaseTask::EXIT_ERROR;
+        $this->returnCode = AbstractLeptirTask::EXIT_ERROR;
         $this->responseLines = array(
             'Execution time exceeded'
         );

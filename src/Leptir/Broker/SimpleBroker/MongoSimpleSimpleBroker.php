@@ -1,6 +1,6 @@
 <?php
 
-namespace Leptir\Broker;
+namespace Leptir\Broker\SimpleBroker;
 
 use Zend\Stdlib\ArrayUtils;
 
@@ -9,7 +9,7 @@ use Zend\Stdlib\ArrayUtils;
  * @package Leptir\Broker
  */
 
-class MongoBroker extends AbstractSimpleBroker
+class MongoSimpleBroker extends AbstractSimpleBroker
 {
     const DEFAULT_HOST = 'localhost';
     const DEFAULT_PORT = 27017;

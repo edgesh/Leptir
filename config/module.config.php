@@ -10,11 +10,21 @@ return array(
     'console' => array(
         'router' => array(
             'routes' => array(
-                'leptir' => array(
+                'leptir-start' => array(
                     'options' => array(
-                        'route' => 'leptir daemon <action> [--config=]',
+                        'route' => 'leptir start [--config=] [--daemon]',
                         'defaults' => array(
                             'controller' => 'Leptir\Controller\Daemon',
+                            'action' => 'start'
+                        )
+                    )
+                ),
+                'leptir-stop' => array(
+                    'options' => array(
+                        'route' => 'leptir stop',
+                        'defaults' => array(
+                            'controller' => 'Leptir\Controller\Daemon',
+                            'action' => 'stop'
                         )
                     )
                 ),
