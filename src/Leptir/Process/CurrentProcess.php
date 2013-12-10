@@ -56,7 +56,6 @@ class CurrentProcess extends Process
             exit(1);
         } else {
             $this->childProcesses[] = new Process($pid);
-            echo (string)getmypid() . " Number of children: " . (string)$this->numberOfActiveChildren() . PHP_EOL;
             if (is_callable($parentCallable)) {
                 call_user_func_array($parentCallable, $parentCallableArguments);
             }

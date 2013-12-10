@@ -48,7 +48,7 @@ class Module implements
             'index.php leptir start [--config config_file.php] [--daemon] [--pid pid_filepath]',
             'index.php leptir stop',
             'index.php leptir install [--config config.php] [--pid pid_filepath] [--php_path php_dir]',
-            'index.php leptir tester <action> <taskName>'
+            'index.php leptir tester <action> <taskName> [--config config.php] [--delaySeconds num_seconds] [--priority P] [--number number_of_task]'
         );
     }
 }

@@ -39,7 +39,7 @@ return array(
                 ),
                 'add-test-task' => array(
                     'options' => array(
-                        'route' => 'leptir tester <action> <taskName> [--config=]',
+                        'route' => 'leptir tester <action> <taskName> [--config=] [--priority=] [--delaySeconds=] [--number=]',
                         'defaults' => array(
                             'controller' => 'Leptir\Controller\Tester'
                         )
