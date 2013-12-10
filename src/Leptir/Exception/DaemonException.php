@@ -12,6 +12,8 @@ class DaemonException extends AbstractLeptirException
         {
             case self::DAEMON_ALREADY_RUNNING:
                 return "Leptir daemon is already running.";
+            default:
+                return "Unknown exception occurred.";
         }
     }
 }

@@ -6,6 +6,8 @@ use Leptir\Logger\LeptirLoggerTrait;
 use Leptir\Task\AbstractLeptirTask;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use Leptir\Broker\SimpleBroker\SimpleBrokerFactory;
+use Leptir\Broker\SimpleBroker\AbstractSimpleBroker;
 
 class Broker implements ServiceLocatorAwareInterface
 {

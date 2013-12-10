@@ -2,6 +2,7 @@
 
 namespace Leptir\Broker\SimpleBroker;
 
+use Leptir\Broker\BrokerTask;
 use Zend\Stdlib\ArrayUtils;
 
 /**

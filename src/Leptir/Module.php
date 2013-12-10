@@ -12,9 +12,7 @@ use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
 
 /**
- * Circlical ACL Admin Interface for BJYAuthorize
  *
- * @author Alexandre Lemaire <alemaire@circlical.com>
  */
 class Module implements
     AutoloaderProviderInterface,
@@ -47,8 +45,9 @@ class Module implements
         return array(
             'Leptir - background task processor',
             'Usage:',
-            'index.php leptir start [--config config_file.php] [--daemon]',
+            'index.php leptir start [--config config_file.php] [--daemon] [--pid pid_filepath]',
             'index.php leptir stop',
+            'index.php leptir install [--config config.php] [--pid pid_filepath] [--php_path php_dir]',
             'index.php leptir tester <action> <taskName>'
         );
     }

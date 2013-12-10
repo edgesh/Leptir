@@ -1,19 +1,21 @@
 <?php
 
-namespace Leptir\Daemon;
+namespace Leptir\Core;
 
 use Leptir\Broker\Broker;
 use Leptir\Broker\BrokerTask;
-use Leptir\Exception\DaemonException;
-use Leptir\Exception\DaemonProcessException;
+use Leptir\Exception\LeptirTaskException;
 use Leptir\Logger\LeptirLoggerTrait;
 use Leptir\MetaBackend\AbstractMetaBackend;
+use Leptir\Process\CurrentProcess;
 
 /**
- * Class Daemon
- * @package Leptir\Daemon
+ * Master process
+ *
+ * Class Master
+ * @package Leptir\Core
  */
-class Daemon
+class Master extends CurrentProcess
 {
     use LeptirLoggerTrait;
 
@@ -22,35 +24,33 @@ class Daemon
     private $configNumberOfWorkers;
     private $configTaskExecutionTime;
 
-    private $daemonProcess;
     private $isRunning = true;
     private $metaBackend = null;
 
     public function __construct (
         Broker $broker,
-        array $daemonConfig,
+        array $masterConfig,
         array $loggers = array(),
         AbstractMetaBackend $metaBackend = null
     ) {
-        $this->loggers = $loggers;
-
-        try {
-            $this->daemonProcess = new DaemonProcess();
-        } catch (DaemonProcessException $e) {
-            $this->logError($e->getMessage());
-            exit(1);
-        }
-        $this->broker = $broker;
-
-        $this->metaBackend = $metaBackend;
-        $this->isRunning = true;
-
-        $configuration = $daemonConfig['configuration'];
+        $configuration = $masterConfig['configuration'];
 
         $this->configEmptyQueueSleepTime = $this->secondsToMicroseconds($configuration['empty_queue_sleep_time']);
         $this->configAllWorkersActiveSleepTime = $this->secondsToMicroseconds($configuration['workers_active_sleep_time']);
         $this->configNumberOfWorkers = $configuration['number_of_workers'];
         $this->configTaskExecutionTime = $configuration['task_execution_time'];
+        $this->configPidFilePath = isset($configuration['pid_path']) ? $configuration['pid_path'] : '/var/run/leptir.pid';
+
+        parent::__construct(
+            array(
+                'pid_path' => $this->configPidFilePath
+            )
+        );
+
+        $this->loggers = $loggers;
+        $this->broker = $broker;
+        $this->metaBackend = $metaBackend;
+        $this->isRunning = true;
 
         // ticks
         declare(
@@ -63,17 +63,14 @@ class Daemon
 
     final public function start()
     {
-        if ($this->daemonProcess->isActive()) {
-            throw new DaemonException(DaemonException::DAEMON_ALREADY_RUNNING);
-        }
-        $this->daemonProcess->startProcess();
+        $this->writeToPidFile();
         $this->run();
     }
 
     private function run()
     {
         while ($this->isRunning) {
-            if ($this->daemonProcess->activeChildrenCount() >= $this->configNumberOfWorkers) {
+            if ($this->numberOfActiveChildren() >= $this->configNumberOfWorkers) {
                 if ($this->configAllWorkersActiveSleepTime) {
                     usleep($this->configAllWorkersActiveSleepTime);
                 }
@@ -84,18 +81,23 @@ class Daemon
                     $numberToSpawn = min(
                         $queueSize,
                         $this->configNumberOfWorkers -
-                        $this->daemonProcess->activeChildrenCount()
+                        $this->numberOfActiveChildren()
                     );
 
                     for ($i=0; $i<$numberToSpawn; $i++) {
                         /** @var BrokerTask $task */
                         $task = $this->broker->getOneTask();
                         if ($task) {
-                            $task->subscribeLoggers($this->loggers);
-                            $this->daemonProcess->createProcessForTask(
-                                $task,
-                                $this->configTaskExecutionTime,
-                                $this->metaBackend
+                            $this->forkProcess(
+                                null,
+                                null,
+                                array(
+                                    $this,
+                                    'childProcessJob'
+                                ),
+                                array(
+                                    'task' => $task
+                                )
                             );
                         }
                     }
@@ -105,25 +107,21 @@ class Daemon
                     }
                 }
             }
-            $this->daemonProcess->updateState();
+            $this->cleanupZombieChildren();
         }
 
         $this->logInfo(
             "Somebody stopped a little butterfly. He's gonna wait for all the children to finish."
         );
-        if ($this->daemonProcess->activeChildrenCount()) {
-            $this->daemonProcess->waitForProcessesToFinish();
+        if ($this->numberOfActiveChildren() > 0) {
+            $this->waitForChildrenToFinish();
         } else {
             $this->logInfo(
                 "There's no active children. Let's just land on the hard surface"
             );
         }
+        $this->removePidFile();
         $this->logInfo("All good. I'm out for now.");
-    }
-
-    public function stopDaemon()
-    {
-        $this->daemonProcess->waitForProcessesToFinish();
     }
 
     public function __signalHandler($signo)
@@ -155,4 +153,26 @@ class Daemon
     {
         return sprintf('[%d](:MASTER:) %s', getmypid(), $message);
     }
+
+    protected function childProcessJob(BrokerTask $task)
+    {
+        $task->subscribeLoggers($this->loggers);
+        try {
+            $task->execute($this->configTaskExecutionTime, $this->metaBackend);
+        } catch (LeptirTaskException $e) { // time limit exceeded exception
+            switch($e->getCode()) {
+                case LeptirTaskException::TIME_LIMIT_EXCEEDED:
+                    // TODO this part is usefull
+                    break;
+                case LeptirTaskException::RUNTIME_ERROR_OCCURRED:
+                    // TODO also pretty usefull
+                    break;
+                default:
+                    break;
+            }
+        } catch (\Exception $e) {
+            // all the other exceptions
+        }
+    }
+
 }

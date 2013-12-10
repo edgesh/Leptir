@@ -2,6 +2,8 @@
 
 namespace Leptir\Broker\SimpleBroker;
 
+use Leptir\Broker\BrokerTask;
+
 abstract class AbstractSimpleBroker
 {
     /**

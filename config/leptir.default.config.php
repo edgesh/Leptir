@@ -6,7 +6,7 @@ return array(
         ),
         'loggers' => array(
         ),
-        'daemon' => array(
+        'leptir' => array(
             'configuration' => array(
                 'task_execution_time' => 600,
                 'number_of_workers' => 4,

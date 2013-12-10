@@ -2,11 +2,9 @@
 
 namespace Leptir\Controller;
 
-use Leptir\Broker\Broker;
 use Leptir\Task\Test\SlowTask;
 use Leptir\Task\Test\TestTask;
 use Zend\Console\Request;
-use Zend\Mvc\Controller\AbstractActionController;
 
 class TesterController extends BaseLeptirController
 {

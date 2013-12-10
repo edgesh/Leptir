@@ -5,7 +5,7 @@ namespace LeptirTest\Mocks;
 use Leptir\Broker\AbstractSimpleBroker;
 use Leptir\Broker\BrokerTask;
 
-class MockSimpleBroker extends AbstractSimpleBroker
+class MockSimpleBroker extends \Leptir\Broker\SimpleBroker\AbstractSimpleBroker
 {
     private $tasks = array();
 

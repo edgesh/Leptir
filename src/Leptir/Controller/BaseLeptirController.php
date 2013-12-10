@@ -3,7 +3,7 @@
 namespace Leptir\Controller;
 
 use Leptir\Broker\Broker;
-use Leptir\Daemon\Daemon;
+use Leptir\Core\Master;
 use Leptir\Logger\LeptirLoggerFactory;
 use Leptir\MetaBackend\MetaBackendFactory;
 use Zend\Config\Factory;
@@ -11,6 +11,7 @@ use Zend\Console\Adapter\AdapterInterface;
 use Zend\Console\ColorInterface;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Stdlib\ArrayUtils;
+use Zend\Console\Request;
 
 class BaseLeptirController extends AbstractActionController
 {
@@ -18,7 +19,7 @@ class BaseLeptirController extends AbstractActionController
     protected $loggers = array();
     protected $metaBackend = null;
     protected $broker = null;
-    protected $daemon = null;
+    protected $master = null;
 
     protected function getDefaultLeptirConfig()
     {
@@ -28,6 +29,7 @@ class BaseLeptirController extends AbstractActionController
 
     protected function getConfigFromParameter()
     {
+        /** @var Request $request */
         $request = $this->getRequest();
         $configFilename = $request->getParam('config');
         $configFromFile = array();
@@ -87,23 +89,25 @@ class BaseLeptirController extends AbstractActionController
         return $this->loggers;
     }
 
-    protected function getDaemonConfig()
+    protected function getMasterConfig()
     {
-        return $this->getConfigByKey('daemon');
+        $config = $this->getConfigByKey('leptir');
+        $config['configuration']['pid_path'] = $this->getPidFilePath();
+        return $config;
     }
 
-    protected function getDaemon()
+    protected function getMaster()
     {
-        if (is_null($this->daemon)) {
-            $this->daemon = new Daemon(
+        if (is_null($this->master)) {
+            $this->master = new Master(
                 $this->getBroker(),
-                $this->getDaemonConfig(),
+                $this->getMasterConfig(),
                 $this->getLoggers(),
                 $this->getMetaBackend()
             );
         }
 
-        return $this->daemon;
+        return $this->master;
     }
 
     protected function getBrokersConfig()
@@ -148,5 +152,16 @@ class BaseLeptirController extends AbstractActionController
         /** @var AdapterInterface $console */
         $console = $this->getServiceLocator()->get('console');
         $console->writeLine('[WARNING] ' . $line, ColorInterface::YELLOW);
+    }
+
+    protected function getPidFilePath()
+    {
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $pidFilePath = $request->getParam('pid', '');
+        if (!$pidFilePath) {
+            $pidFilePath = '/var/run/leptir.pid';
+        }
+        return $pidFilePath;
     }
 }

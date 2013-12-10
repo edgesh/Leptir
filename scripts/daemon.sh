@@ -4,8 +4,7 @@ PID_PATH='{{PID_PATH}}'
 case "$1" in
 start)
 	# check if PID file exists
-	if [ -f /var/run/leptir.pid ]; then
-		#check if process is actually activea
+	if [ -f $PID_PATH ]; then
 		pid="`cat $PID_PATH`"
 		if ps $pid > /dev/null
 		then
@@ -17,11 +16,11 @@ start)
 		fi
 	fi
 	echo -e "\e[32mStarting a little butterfly. Fly buddy, fly!\e[0m"
-    {{PHP_PATH}}php {{ROOT_PATH}}index.php leptir start  --config={{CONFIG_PATH}} --daemon
+    {{PHP_PATH}}php {{ROOT_PATH}}/public/index.php leptir start  --config={{CONFIG_PATH}} --daemon --pid $PID_PATH
 ;;
 stop)
     echo -ne "Stopping a little butterfly. You'll have to wait for all the tasks to finish though.\n"
-	{{PHP_PATH}}php {{ROOT_PATH}}index.php leptir stop
+	{{PHP_PATH}}php {{ROOT_PATH}}/public/index.php leptir stop --pid $PID_PATH
 	while [ -f $PID_PATH ];
 	do
 		sleep 1
@@ -35,4 +34,3 @@ stop)
 esac
 
 exit 0
-

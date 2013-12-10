@@ -150,7 +150,7 @@ class BrokerTest extends AbstractControllerTestCase
 
         $this->assertNotNull($brokerTask);
 
-        $this->assertInstanceof('Leptir\Task\BaseTask', $brokerTask->getTask());
+        $this->assertInstanceof('Leptir\Task\AbstractLeptirTask', $brokerTask->getTask());
         $this->assertInstanceof('Zend\ServiceManager\ServiceLocatorAwareInterface', $brokerTask->getTask());
 
         /** @var MockTask $task */

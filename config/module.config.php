@@ -3,7 +3,7 @@
 return array(
     'controllers' => array(
         'invokables' => array(
-            'Leptir\Controller\Daemon' => 'Leptir\Controller\DaemonController',
+            'Leptir\Controller\Leptir' => 'Leptir\Controller\LeptirController',
             'Leptir\Controller\Tester' => 'Leptir\Controller\TesterController'
         ),
     ),
@@ -12,19 +12,28 @@ return array(
             'routes' => array(
                 'leptir-start' => array(
                     'options' => array(
-                        'route' => 'leptir start [--config=] [--daemon]',
+                        'route' => 'leptir start [--config=] [--daemon] [--pid=]',
                         'defaults' => array(
-                            'controller' => 'Leptir\Controller\Daemon',
+                            'controller' => 'Leptir\Controller\Leptir',
                             'action' => 'start'
                         )
                     )
                 ),
                 'leptir-stop' => array(
                     'options' => array(
-                        'route' => 'leptir stop',
+                        'route' => 'leptir stop [--config=] [--pid=]',
                         'defaults' => array(
-                            'controller' => 'Leptir\Controller\Daemon',
+                            'controller' => 'Leptir\Controller\Leptir',
                             'action' => 'stop'
+                        )
+                    )
+                ),
+                'leptir-install' => array(
+                    'options' => array(
+                        'route' => 'leptir install [--config=] [--pid=] [--php_path=]',
+                        'defaults' => array(
+                            'controller' => 'Leptir\Controller\Leptir',
+                            'action' => 'install'
                         )
                     )
                 ),

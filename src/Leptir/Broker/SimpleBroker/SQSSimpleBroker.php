@@ -5,6 +5,7 @@ namespace Leptir\Broker\SimpleBroker;
 use Leptir\Exception\SQSBrokerException;
 use Leptir\Helper\SQSQueue;
 use Leptir\Task\AbstractLeptirTask;
+use Leptir\Broker\BrokerTask;
 
 class SQSSimpleBroker extends AbstractSimpleBroker
 {
