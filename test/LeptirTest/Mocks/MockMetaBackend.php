@@ -2,9 +2,9 @@
 
 namespace LeptirTest\Mocks;
 
-use Leptir\MetaBackend\AbstractMetaBackend;
+use Leptir\MetaStorage\AbstractMetaStorage;
 
-class MockMetaBackend extends AbstractMetaBackend
+class MockMetaBackend extends AbstractMetaStorage
 {
 
     public $info = null;

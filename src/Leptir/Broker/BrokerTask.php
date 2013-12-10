@@ -2,7 +2,7 @@
 
 namespace Leptir\Broker;
 
-use Leptir\MetaBackend\AbstractMetaBackend;
+use Leptir\MetaStorage\AbstractMetaStorage;
 use Leptir\Task\AbstractLeptirTask;
 use Zend\Log\Logger;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
@@ -100,7 +100,7 @@ class BrokerTask
     /**
      * Execute inner task.
      */
-    final public function execute($executionTime = 0, AbstractMetaBackend $metaBackend = null)
+    final public function execute($executionTime = 0, AbstractMetaStorage $metaBackend = null)
     {
         $this->task->execute($executionTime, $metaBackend);
     }

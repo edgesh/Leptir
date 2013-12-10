@@ -1,9 +1,9 @@
 <?php
 
-namespace Leptir\MetaBackend;
+namespace Leptir\MetaStorage;
 
 
-abstract class AbstractMetaBackend
+abstract class AbstractMetaStorage
 {
     private $configNumberOfRecordsToKeep = -1;
 
@@ -13,7 +13,10 @@ abstract class AbstractMetaBackend
             $this->configNumberOfRecordsToKeep = intval($config['capped_size']);
         }
     }
+
     abstract public function saveMetaInfo(\ArrayObject $object);
+
+    abstract public function loadMetaInfoById($id);
 
     protected function numberOfRecordsToKeep()
     {

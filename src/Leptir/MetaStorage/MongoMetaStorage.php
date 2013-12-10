@@ -1,10 +1,10 @@
 <?php
 
-namespace Leptir\MetaBackend;
+namespace Leptir\MetaStorage;
 
 use Zend\Stdlib\ArrayUtils;
 
-class MongoMetaBackend extends AbstractMetaBackend
+class MongoMetaStorage extends AbstractMetaStorage
 {
     const DEFAULT_HOST = 'localhost';
     const DEFAULT_PORT = 27017;
@@ -49,5 +49,20 @@ class MongoMetaBackend extends AbstractMetaBackend
             }
         }
         $this->mongoConnection->save($object);
+    }
+
+    public function loadMetaInfoById($id)
+    {
+        $object = $this->mongoConnection->findOne(
+           array(
+                '_id' => $id
+           )
+        );
+        if (!$object) {
+            return null;
+        }
+        $object['id'] = $object['_id'];
+        unset($object['_id']);
+        return new \ArrayObject($object);
     }
 }

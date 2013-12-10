@@ -1,8 +1,8 @@
 <?php
 
-namespace Leptir\MetaBackend;
+namespace Leptir\MetaStorage;
 
-class MetaBackendFactory
+class MetaStorageFactory
 {
     public static function factory($config)
     {
@@ -10,7 +10,9 @@ class MetaBackendFactory
 
         switch($type) {
             case 'mongodb':
-                return new MongoMetaBackend($config);
+                return new MongoMetaStorage($config);
+            case 'redis':
+                return new RedisMetaStorage($config);
             default:
                 return null;
         }

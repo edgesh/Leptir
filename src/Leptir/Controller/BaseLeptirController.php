@@ -5,7 +5,7 @@ namespace Leptir\Controller;
 use Leptir\Broker\Broker;
 use Leptir\Core\Master;
 use Leptir\Logger\LeptirLoggerFactory;
-use Leptir\MetaBackend\MetaBackendFactory;
+use Leptir\MetaStorage\MetaStorageFactory;
 use Zend\Config\Factory;
 use Zend\Console\Adapter\AdapterInterface;
 use Zend\Console\ColorInterface;
@@ -130,12 +130,12 @@ class BaseLeptirController extends AbstractActionController
     }
 
     /**
-     * @return \Leptir\MetaBackend\MongoMetaBackend|null
+     * @return \Leptir\MetaStorage\MongoMetaStorage|null
      */
     protected function getMetaBackend()
     {
         if (is_null($this->metaBackend)) {
-            $this->metaBackend = MetaBackendFactory::factory($this->getMetaStorageConfig());
+            $this->metaBackend = MetaStorageFactory::factory($this->getMetaStorageConfig());
         }
         return $this->metaBackend;
     }
