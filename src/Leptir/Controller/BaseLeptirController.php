@@ -5,6 +5,7 @@ namespace Leptir\Controller;
 use Leptir\Broker\Broker;
 use Leptir\Core\Master;
 use Leptir\Logger\LeptirLoggerFactory;
+use Leptir\MetaStorage\MetaStorage;
 use Leptir\MetaStorage\MetaStorageFactory;
 use Zend\Config\Factory;
 use Zend\Console\Adapter\AdapterInterface;
@@ -17,7 +18,7 @@ class BaseLeptirController extends AbstractActionController
 {
     protected $config = array();
     protected $loggers = array();
-    protected $metaBackend = null;
+    protected $metaStorage = null;
     protected $broker = null;
     protected $master = null;
 
@@ -103,7 +104,7 @@ class BaseLeptirController extends AbstractActionController
                 $this->getBroker(),
                 $this->getMasterConfig(),
                 $this->getLoggers(),
-                $this->getMetaBackend()
+                $this->getMetaStorage()
             );
         }
 
@@ -132,12 +133,12 @@ class BaseLeptirController extends AbstractActionController
     /**
      * @return \Leptir\MetaStorage\MongoMetaStorage|null
      */
-    protected function getMetaBackend()
+    protected function getMetaStorage()
     {
-        if (is_null($this->metaBackend)) {
-            $this->metaBackend = MetaStorageFactory::factory($this->getMetaStorageConfig());
+        if (is_null($this->metaStorage)) {
+            $this->metaStorage = new MetaStorage($this->getMetaStorageConfig());
         }
-        return $this->metaBackend;
+        return $this->metaStorage;
     }
 
     protected function writeErrorLine($line)

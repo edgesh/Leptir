@@ -5,7 +5,7 @@ namespace Leptir\Task;
 use Leptir\Exception\LeptirInputException;
 use Leptir\Exception\LeptirTaskException;
 use Leptir\Logger\LeptirLoggerTrait;
-use Leptir\MetaStorage\AbstractMetaStorage;
+use Leptir\MetaStorage\MetaStorage;
 use Zend\Stdlib\ArrayUtils;
 
 abstract class AbstractLeptirTask
@@ -31,7 +31,7 @@ abstract class AbstractLeptirTask
     private $taskExecutionStartTime = null;
 
     /**
-     * @var AbstractMetaStorage|null
+     * @var MetaStorage|null
      */
     private $metaBackend = null;
 
@@ -52,7 +52,7 @@ abstract class AbstractLeptirTask
     /**
      * Method which triggers task execution and all the dependencies that come with that.
      */
-    final public function execute($executionTime = 0, AbstractMetaStorage $metaBackend = null)
+    final public function execute($executionTime = 0, MetaStorage $metaBackend = null)
     {
         $this->taskExecutionStartTime = new \DateTime();
 
@@ -389,7 +389,7 @@ abstract class AbstractLeptirTask
 
     final public function saveTaskMetaInfo()
     {
-        if (!is_null($this->metaBackend) && ($this->metaBackend instanceof AbstractMetaStorage)) {
+        if (!is_null($this->metaBackend) && ($this->metaBackend instanceof MetaStorage)) {
             $info = $this->getMetaInfo();
             $this->metaBackend->saveMetaInfo($info);
         }

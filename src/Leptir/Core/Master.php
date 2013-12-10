@@ -6,7 +6,7 @@ use Leptir\Broker\Broker;
 use Leptir\Broker\BrokerTask;
 use Leptir\Exception\LeptirTaskException;
 use Leptir\Logger\LeptirLoggerTrait;
-use Leptir\MetaStorage\AbstractMetaStorage;
+use Leptir\MetaStorage\MetaStorage;
 use Leptir\Process\CurrentProcess;
 
 /**
@@ -31,7 +31,7 @@ class Master extends CurrentProcess
         Broker $broker,
         array $masterConfig,
         array $loggers = array(),
-        AbstractMetaStorage $metaBackend = null
+        MetaStorage $metaBackend = null
     ) {
         $configuration = $masterConfig['configuration'];
 

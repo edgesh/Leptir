@@ -6,6 +6,7 @@ use Leptir\Exception\LeptirTaskException;
 use LeptirTest\Mocks\MockMetaBackend;
 use LeptirTest\Mocks\MockPHPErrorTask;
 use LeptirTest\Mocks\MockSlowTask;
+use LeptirTest\Mocks\MockMetaStorage;
 use Zend\Test\PHPUnit\Controller\AbstractControllerTestCase;
 
 class TaskTest extends AbstractControllerTestCase
@@ -22,7 +23,7 @@ class TaskTest extends AbstractControllerTestCase
 
     public function testTimeLimit()
     {
-        $backend = new MockMetaBackend();
+        $backend = new MockMetaStorage(new MockMetaBackend());
         $start = microtime(true);
         try{
             /**
@@ -40,7 +41,7 @@ class TaskTest extends AbstractControllerTestCase
 
     public function testPHPError()
     {
-        $backend = new MockMetaBackend();
+        $backend = new MockMetaStorage(new MockMetaBackend());
         $task = new MockPHPErrorTask();
         $task->execute(0, $backend);
 

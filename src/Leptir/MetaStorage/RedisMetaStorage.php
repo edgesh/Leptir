@@ -27,7 +27,9 @@ class RedisMetaStorage extends AbstractMetaStorage
      */
     private $key;
 
-    function __construct()
+    private $exipreAfterSeconds = -1;
+
+    function __construct(array $config = array())
     {
         $connection = isset($config['connection']) ? $config['connection'] : array();
 
@@ -37,6 +39,12 @@ class RedisMetaStorage extends AbstractMetaStorage
         $database = intval(isset($connection['database']) ? $connection['database'] : 0);
 
         $this->key = isset($connection['key']) ? $connection['key'] : 'leptir:taskinfo';
+
+        $configuration = $config['configuration'];
+
+        if (isset($configuration['expire_after_seconds'])) {
+            $this->exipreAfterSeconds = intval($configuration['expire_after_seconds']);
+        }
 
         $this->redisClient = new Client(
             array(
@@ -54,6 +62,9 @@ class RedisMetaStorage extends AbstractMetaStorage
         $key = $this->key . ':' . $taskId;
 
         $this->redisClient->set($key, json_encode($object));
+        if ($this->exipreAfterSeconds > 0) {
+            $this->redisClient->expire($key, $this->exipreAfterSeconds);
+        }
     }
 
     public function loadMetaInfoById($id)

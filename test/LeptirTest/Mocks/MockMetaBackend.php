@@ -24,4 +24,10 @@ class MockMetaBackend extends AbstractMetaStorage
         return $this->info;
     }
 
+    public function loadMetaInfoById($id)
+    {
+        return $this->info;
+    }
+
+
 }
