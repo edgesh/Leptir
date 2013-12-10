@@ -4,6 +4,8 @@ namespace Leptir\Controller;
 
 use Leptir\Task\Test\SlowTask;
 use Leptir\Task\Test\TestTask;
+use Leptir\Task\Test\ErrorTask;
+use Leptir\Task\Test\ExceptionTask;
 use Zend\Console\Request;
 
 class TesterController extends BaseLeptirController
@@ -44,6 +46,10 @@ class TesterController extends BaseLeptirController
                 );
             case 'slow':
                 return new SlowTask();
+            case 'error':
+                return new ErrorTask();
+            case 'exception':
+                return new ExceptionTask();
             default:
                 $this->writeErrorLine('Task not recognized: ' . $name);
                 break;

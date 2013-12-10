@@ -69,7 +69,7 @@ class LeptirController extends BaseLeptirController
                     $this->writeErrorLine($ex->getMessage());
                     exit(1);
                 }
-                $master->start();
+                $master->start(true);
             }
         }
     }

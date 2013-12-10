@@ -17,6 +17,7 @@ abstract class AbstractLeptirTask
     const EXIT_WARNING = 2;
     const EXIT_ERROR = 3;
     const EXIT_UNKNOWN = 4;
+    const EXIT_TIME_LIMIT_EXCEEDED = 5;
 
     const STATUS_PENDING = 1;
     const STATUS_IN_PROGRESS = 2;
@@ -42,11 +43,6 @@ abstract class AbstractLeptirTask
     {
         $this->returnCode = self::EXIT_UNKNOWN;
         $this->parameters = $parameters;
-    }
-
-    public function prepareForExecution()
-    {
-
     }
 
     /**
@@ -75,10 +71,10 @@ abstract class AbstractLeptirTask
             pcntl_alarm($executionTime);
         }
 
-        register_shutdown_function(
+        set_error_handler(
             array(
                 $this,
-                '__shutdownHandler'
+                '__errorHandler'
             )
         );
 
@@ -87,6 +83,14 @@ abstract class AbstractLeptirTask
         @$this->beforeStart();
         try {
             $resp = $this->doJob();
+        } catch (LeptirTaskException $ex) {
+            if ($ex->getCode() == LeptirTaskException::TIME_LIMIT_EXCEEDED) {
+                $resp = self::EXIT_TIME_LIMIT_EXCEEDED;
+                $this->addResponseLine('Time limit exceeded.');
+            } else {
+                $resp = self::EXIT_ERROR;
+                $this->addResponseLine('LeptirTaskException occurred. ' . $ex->getMessage());
+            }
         } catch (\Exception $ex) {
             $this->addResponseLine('Task exited with exception: ' . $ex->getMessage());
             $this->logError('Task exited with exception: ' . $ex->getMessage());
@@ -95,9 +99,10 @@ abstract class AbstractLeptirTask
 
         if ($resp !== self::EXIT_SUCCESS &&
             $resp !== self::EXIT_WARNING &&
-            $resp != self::EXIT_ERROR &&
-            $resp != self::EXIT_UNKNOWN) {
-            $resp = self::EXIT_UNKNOWN;
+            $resp !== self::EXIT_ERROR &&
+            $resp !== self::EXIT_TIME_LIMIT_EXCEEDED &&
+            $resp !== self::EXIT_UNKNOWN) {
+                $resp = self::EXIT_UNKNOWN;
         }
         $this->returnCode = $resp;
         @$this->afterFinish();
@@ -171,26 +176,39 @@ abstract class AbstractLeptirTask
      * Errors are handled manually and shown in logs.
      *
      */
-    public function __shutdownHandler()
-    {
-        $error = error_get_last();
 
-        if (!is_null($error) && isset($error['message'])) {
-            $responseLine = 'Task exited unexpectedly with error message: "' . $error['message'] . '"';
-            $this->logError(
-                $responseLine
-            );
-            $this->responseLines = array(
-                $responseLine
-            );
-            $this->returnCode = AbstractLeptirTask::EXIT_ERROR;
-            $this->taskStatus = self::STATUS_COMPLETED;
-
-            $this->saveTaskMetaInfo();
-
-            throw new LeptirTaskException(LeptirTaskException::RUNTIME_ERROR_OCCURRED);
+    public function __errorHandler(
+        $errorNumber,
+        $errorString,
+        $errorFile,
+        $errorLine
+    ) {
+        $this->returnCode = self::EXIT_ERROR;
+        $this->taskStatus = self::STATUS_COMPLETED;
+        switch($errorNumber) {
+            case E_USER_ERROR:
+                $responseLine = '[E_USER_ERROR] ';
+                break;
+            case E_USER_WARNING:
+                $responseLine = '[E_USER_WARNING] ';
+                break;
+            case E_USER_NOTICE:
+                $responseLine = '[E_USER_NOTICE] ';
+                break;
+            default:
+                $responseLine = '[Error] ';
+                break;
         }
+
+        $responseLine .= $errorString . ' (File: ' . $errorFile . ', Line: ' . (string)$errorLine . ')';
+        $this->responseLines = array(
+            $responseLine
+        );
+
+        $this->saveTaskMetaInfo();
+        return true;
     }
+
 
     /**
      * @param string $paramName
@@ -301,16 +319,6 @@ abstract class AbstractLeptirTask
     {
         $this->logInfo('Task execution time exceeded.');
         $this->__timeEnd = microtime(true);
-
-        $this->printTaskEndLog();
-
-        $this->returnCode = AbstractLeptirTask::EXIT_ERROR;
-        $this->responseLines = array(
-            'Execution time exceeded'
-        );
-        $this->taskStatus = self::STATUS_COMPLETED;
-
-        $this->saveTaskMetaInfo();
 
         throw new LeptirTaskException(LeptirTaskException::TIME_LIMIT_EXCEEDED);
     }

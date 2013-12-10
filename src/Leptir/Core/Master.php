@@ -27,6 +27,8 @@ class Master extends CurrentProcess
     private $isRunning = true;
     private $metaBackend = null;
 
+    private $isDaemon = false;
+
     public function __construct (
         Broker $broker,
         array $masterConfig,
@@ -61,8 +63,9 @@ class Master extends CurrentProcess
         $this->setupSignalHandler(SIGTERM);
     }
 
-    final public function start()
+    final public function start($isDaemon = false)
     {
+        $this->isDaemon = $isDaemon;
         $this->writeToPidFile();
         $this->run();
     }
