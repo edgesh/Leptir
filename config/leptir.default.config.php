@@ -2,7 +2,6 @@
 return array(
     'leptir' => array(
         'brokers' => array(
-
         ),
         'loggers' => array(
         ),

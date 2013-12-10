@@ -48,7 +48,7 @@ abstract class AbstractLeptirTask
     /**
      * Method which triggers task execution and all the dependencies that come with that.
      */
-    final public function execute($executionTime = 0, MetaStorage $metaBackend = null)
+    final public function execute($timeLimit = 0, MetaStorage $metaBackend = null)
     {
         $this->taskExecutionStartTime = new \DateTime();
 
@@ -60,7 +60,7 @@ abstract class AbstractLeptirTask
 
         $this->taskStatus = self::STATUS_IN_PROGRESS;
 
-        if ($executionTime > 0) {
+        if ($timeLimit > 0) {
             pcntl_signal(
                 SIGALRM,
                 array(
@@ -68,7 +68,7 @@ abstract class AbstractLeptirTask
                     '__alarmHandler'
                 )
             );
-            pcntl_alarm($executionTime);
+            pcntl_alarm($timeLimit);
         }
 
         set_error_handler(

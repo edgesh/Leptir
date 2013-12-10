@@ -231,11 +231,15 @@ class Broker implements ServiceLocatorAwareInterface
         }
     }
 
-    final public function pushTask(AbstractLeptirTask $task, \DateTime $timeOfExecution = null, $priority = 0)
-    {
+    final public function pushTask(
+        AbstractLeptirTask $task,
+        \DateTime $timeOfExecution = null,
+        $priority = 0,
+        $timeLimit = 0
+    ) {
         $taskId = $this->generateUniqueId();
         $task->setTaskId($taskId);
-        $brokerTask = new BrokerTask($task, $priority, $timeOfExecution);
+        $brokerTask = new BrokerTask($task, $priority, $timeOfExecution, $timeLimit);
 
         /** @var AbstractSimpleBroker $simpleBroker */
         $simpleBroker = $this->getBrokerForPriority($priority);

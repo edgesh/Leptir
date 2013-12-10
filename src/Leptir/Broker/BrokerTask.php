@@ -23,6 +23,7 @@ class BrokerTask
     const PRIORITY_KEY = 'pr';
     const TIME_OF_EXECUTION_KEY = 'toex';
     const TASK_DATA_KEY = 'td';
+    const TASK_TIME_LIMIT_KEY = 'tl';
 
     /**
      * Task being decorated.
@@ -45,11 +46,24 @@ class BrokerTask
      */
     private $timeOfExecution = null;
 
-    public function __construct(AbstractLeptirTask $task, $priority = -1, \DateTime $timeOfExecution = null)
-    {
+    /**
+     * Task time limit in seconds. If time limit is less or equal to zero, default leptir
+     * time limit configuration will be used.
+     *
+     * @var int
+     */
+    private $timeLimit = 0;
+
+    public function __construct(
+        AbstractLeptirTask $task,
+        $priority = -1,
+        \DateTime $timeOfExecution = null,
+        $timeLimit = 0
+    ) {
         $this->task = $task;
         $this->priority = $priority;
         $this->timeOfExecution = $timeOfExecution;
+        $this->timeLimit = $timeLimit;
     }
 
     /**
@@ -64,6 +78,7 @@ class BrokerTask
         $className = $arrayCopy[self::CLASS_NAME_KEY];
         $priority = intval($arrayCopy[self::PRIORITY_KEY]);
         $timeOfExecution = $arrayCopy[self::TIME_OF_EXECUTION_KEY];
+        $timeLimit = $arrayCopy[self::TASK_TIME_LIMIT_KEY];
 
         if (!intval($timeOfExecution)) {
             $timeOfExecution = null;
@@ -79,7 +94,7 @@ class BrokerTask
             return null;
         }
 
-        return new self($task, $priority, $timeOfExecution);
+        return new self($task, $priority, $timeOfExecution, $timeLimit);
 
     }
 
@@ -100,9 +115,13 @@ class BrokerTask
     /**
      * Execute inner task.
      */
-    final public function execute($executionTime = 0, MetaStorage $metaBackend = null)
+    final public function execute($timeLimit = 0, MetaStorage $metaBackend = null)
     {
-        $this->task->execute($executionTime, $metaBackend);
+        if ($this->getTimeLimit() <= 0) {
+            $this->task->execute($timeLimit, $metaBackend);
+        } else {
+            $this->task->execute($this->getTimeLimit(), $metaBackend);
+        }
     }
 
     /**
@@ -115,6 +134,7 @@ class BrokerTask
         $arrayObject = new \ArrayObject();
         $arrayObject[self::CLASS_NAME_KEY] = get_class($this->task);
         $arrayObject[self::PRIORITY_KEY] = $this->priority;
+        $arrayObject[self::TASK_TIME_LIMIT_KEY] = $this->getTimeLimit();
         if ($this->timeOfExecution instanceof \DateTime) {
             $arrayObject[self::TIME_OF_EXECUTION_KEY] = $this->timeOfExecution->getTimestamp();
         } else {
@@ -137,6 +157,15 @@ class BrokerTask
     final public function getTimeOfExecution()
     {
         return $this->timeOfExecution;
+    }
+
+    /**
+     * Task time limit getter.
+     * @return int
+     */
+    final public function getTimeLimit()
+    {
+        return $this->timeLimit;
     }
 
     /**

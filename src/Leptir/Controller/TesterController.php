@@ -22,6 +22,7 @@ class TesterController extends BaseLeptirController
         $priority = intval($request->getParam('priority', 0));
         $quantity = intval($request->getParam('number', 1));
         $delaySeconds = intval($request->getParam('delaySeconds', 0));
+        $timeLimit = intval($request->getParam('timeLimit', 0));
 
         $broker = $this->getBroker();
         $now = new \DateTime();
@@ -31,7 +32,7 @@ class TesterController extends BaseLeptirController
 
         for($i=0; $i<$quantity; $i++) {
             $task = $this->getTaskFromName($request->getParam('taskName'));
-            $broker->pushTask($task, $now, $priority);
+            $broker->pushTask($task, $now, $priority, $timeLimit);
         }
     }
 
