@@ -44,11 +44,39 @@ class Module implements
     {
         return array(
             'Leptir - background task processor',
-            'Usage:',
-            'index.php leptir start [--config config_file.php] [--daemon] [--pid pid_filepath]',
-            'index.php leptir stop',
-            'index.php leptir install [--config config.php] [--pid pid_filepath] [--php_path php_dir]',
-            'index.php leptir tester <action> <taskName> [--config config.php] [--delaySeconds num_seconds] [--priority P] [--number number_of_task]'
+            'leptir start [--config config_file.php] [--daemon] [--pid pid_filepath]' =>
+                'Start leptir process',
+            array(
+                '--config=', 'Config file path'
+            ),
+            array(
+                '--daemon', 'Start process as a daemon (in background)'
+            ),
+            array(
+                '--pid=', 'PID file path (default: /var/run/leptir.pid)'
+            ),
+            'leptir stop [--pid=]' => 'Stop leptir process',
+            array(
+                '--pid=' => 'PID file path (default: /var/run/leptir.pid'
+            ),
+            'leptir install [--config=] [--daemon] [--pid=] [--php_path=]' => 'Install leptir as a service',
+            array(
+                '--php_path=', 'Path to PHP interpreter'
+            ),
+            'leptir tester <action> <taskName> [--config=] [--dalaySeconds=] [--priority=] [--number=] [--timeLimit=]' =>
+                'Leptir task testers - push testing tasks into the queue',
+            array(
+                '--delaySeconds=', 'Schedule/delay tasks for some amount of seconds'
+            ),
+            array(
+                '--priority=', 'Task priority. This will make difference if there are multiple brokers with different priorities defined.'
+            ),
+            array(
+                '--number=', 'Number of copies to create. (default: 1)'
+            ),
+            array(
+                '--timeLimit=', 'Task time limit. This will override default task time limit defined in configuration file'
+            )
         );
     }
 }
