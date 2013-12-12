@@ -126,6 +126,11 @@ class Broker implements ServiceLocatorAwareInterface
     public function getOneTask()
     {
         $broker = $this->getBrokerForNextTask();
+
+        if (is_null($broker)) {
+            return null;
+        }
+
         $task = $broker->popBrokerTask();
         if ($task) {
             $broker->decreaseCachedCount(1);
