@@ -15,5 +15,4 @@ class ErrorTask extends AbstractLeptirTask
     {
         trigger_error('Very nice! How much?');
     }
-
 }

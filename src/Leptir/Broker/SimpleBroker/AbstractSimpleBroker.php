@@ -107,7 +107,8 @@ abstract class AbstractSimpleBroker
      *
      * @param int $value
      */
-    final public function increaseCachedCount($value) {
+    final public function increaseCachedCount($value)
+    {
         $this->cachedCount += $value;
     }
 
@@ -116,7 +117,8 @@ abstract class AbstractSimpleBroker
      *
      * @param int $value
      */
-    final public function decreaseCachedCount($value) {
+    final public function decreaseCachedCount($value)
+    {
         $this->cachedCount = max($this->cachedCount - $value, 0);
     }
 

@@ -46,7 +46,7 @@ class Process
             return;
         }
 
-        while($this->isActive()) {
+        while ($this->isActive()) {
             usleep(200000);
             $this->cleanupIfZombie();
         }
@@ -75,5 +75,4 @@ class Process
     {
         posix_kill($this->getPid(), $signo);
     }
-
 }

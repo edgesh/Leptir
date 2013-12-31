@@ -54,9 +54,9 @@ class MongoMetaStorage extends AbstractMetaStorage
     public function loadMetaInfoById($id)
     {
         $object = $this->mongoConnection->findOne(
-           array(
+            array(
                 '_id' => $id
-           )
+            )
         );
         if (!$object) {
             return null;

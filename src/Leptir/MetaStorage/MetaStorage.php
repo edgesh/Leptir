@@ -8,8 +8,7 @@ class MetaStorage
 
     public function __construct(array $conf = array())
     {
-        foreach($conf as $storageConfig)
-        {
+        foreach ($conf as $storageConfig) {
             $storage = MetaStorageFactory::factory($storageConfig);
             $this->storageList[] = $storage;
         }
@@ -18,9 +17,8 @@ class MetaStorage
     public function saveMetaInfo(\ArrayObject $metaInfo)
     {
         /** @var $storage AbstractMetaStorage */
-        foreach($this->storageList as $storage) {
+        foreach ($this->storageList as $storage) {
             $storage->saveMetaInfo($metaInfo);
         }
     }
-
 }

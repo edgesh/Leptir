@@ -67,7 +67,7 @@ class CurrentProcess extends Process
         $stillActive = array();
 
         /** @var $process Process */
-        foreach($this->childProcesses as $process) {
+        foreach ($this->childProcesses as $process) {
             $process->cleanupIfZombie();
             if ($process->isActive()) {
                 $stillActive[] = $process;
@@ -78,7 +78,7 @@ class CurrentProcess extends Process
 
     protected function waitForChildrenToFinish()
     {
-        while(!empty($this->childProcesses)) {
+        while (!empty($this->childProcesses)) {
             $this->cleanupZombieChildren();
             usleep(200000);
         }

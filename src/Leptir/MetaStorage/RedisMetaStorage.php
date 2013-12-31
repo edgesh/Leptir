@@ -29,7 +29,7 @@ class RedisMetaStorage extends AbstractMetaStorage
 
     private $exipreAfterSeconds = -1;
 
-    function __construct(array $config = array())
+    public function __construct(array $config = array())
     {
         $connection = isset($config['connection']) ? $config['connection'] : array();
 
@@ -77,7 +77,4 @@ class RedisMetaStorage extends AbstractMetaStorage
         }
         return new \ArrayObject(json_decode($object, true));
     }
-
-
 }
- 

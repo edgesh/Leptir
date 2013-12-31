@@ -16,5 +16,4 @@ class ExceptionTask extends AbstractLeptirTask
     {
         throw new \Exception('Very nice! How much?');
     }
-
 }

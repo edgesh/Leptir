@@ -42,7 +42,7 @@ class LeptirController extends BaseLeptirController
 
         if (!$isDaemon) {
 
-            try{
+            try {
                 $master = $this->getMaster();
             } catch (\Exception $ex) {
                 $this->writeErrorLine($ex->getMessage());
@@ -63,7 +63,7 @@ class LeptirController extends BaseLeptirController
             } elseif ($pid == 0) {
                 // child process which will be a daemon
                 posix_setsid();
-                try{
+                try {
                     $master = $this->getMaster();
                 } catch (\Exception $ex) {
                     $this->writeErrorLine($ex->getMessage());
@@ -116,8 +116,11 @@ class LeptirController extends BaseLeptirController
         if (!defined('ROOT_PATH')) {
             $this->writeWarningLine('ROOT_PATH not defined.');
             $this->writeWarningLine(
-'Add line to index.php:
-    define("ROOT_PATH", dirname(__DIR__));');
+                'Add line to index.php:'
+            );
+            $this->writeWarningLine(
+                '   define("ROOT_PATH", dirname(__DIR__));'
+            );
             exit(1);
         }
 

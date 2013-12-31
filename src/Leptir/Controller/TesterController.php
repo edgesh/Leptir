@@ -30,7 +30,7 @@ class TesterController extends BaseLeptirController
             $now->add(new \DateInterval('PT' . $delaySeconds . 'S'));
         }
 
-        for($i=0; $i<$quantity; $i++) {
+        for ($i=0; $i<$quantity; $i++) {
             $task = $this->getTaskFromName($request->getParam('taskName'));
             $broker->pushTask($task, $now, $priority, $timeLimit);
         }
@@ -56,5 +56,4 @@ class TesterController extends BaseLeptirController
                 break;
         }
     }
-
 }

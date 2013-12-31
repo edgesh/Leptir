@@ -37,11 +37,16 @@ class Master extends CurrentProcess
     ) {
         $configuration = $masterConfig['configuration'];
 
-        $this->configEmptyQueueSleepTime = $this->secondsToMicroseconds($configuration['empty_queue_sleep_time']);
-        $this->configAllWorkersActiveSleepTime = $this->secondsToMicroseconds($configuration['workers_active_sleep_time']);
+        $this->configEmptyQueueSleepTime = $this->secondsToMicroseconds(
+            $configuration['empty_queue_sleep_time']
+        );
+        $this->configAllWorkersActiveSleepTime = $this->secondsToMicroseconds(
+            $configuration['workers_active_sleep_time']
+        );
         $this->configNumberOfWorkers = $configuration['number_of_workers'];
         $this->configTaskExecutionTime = $configuration['task_execution_time'];
-        $this->configPidFilePath = isset($configuration['pid_path']) ? $configuration['pid_path'] : '/var/run/leptir.pid';
+        $this->configPidFilePath = isset($configuration['pid_path']) ?
+            $configuration['pid_path'] : '/var/run/leptir.pid';
 
         parent::__construct(
             array(
@@ -127,7 +132,7 @@ class Master extends CurrentProcess
         $this->logInfo("All good. I'm out for now.");
     }
 
-    public function __signalHandler($signo)
+    public function signalHandler($signo)
     {
         $this->isRunning = false;
         $this->logInfo(
@@ -142,7 +147,7 @@ class Master extends CurrentProcess
             $signal,
             array(
                 $this,
-                '__signalHandler'
+                'signalHandler'
             )
         );
     }
@@ -177,5 +182,4 @@ class Master extends CurrentProcess
             // all the other exceptions
         }
     }
-
 }

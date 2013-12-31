@@ -36,8 +36,8 @@ abstract class AbstractLeptirTask
      */
     private $metaBackend = null;
 
-    private $__timeStart;
-    private $__timeEnd;
+    private $taskTimeStart;
+    private $taskTimeEnd;
 
     public function __construct(array $parameters = array())
     {
@@ -56,7 +56,7 @@ abstract class AbstractLeptirTask
 
         $this->metaBackend = $metaBackend;
 
-        $this->__timeStart = microtime(true);
+        $this->taskTimeStart = microtime(true);
 
         $this->taskStatus = self::STATUS_IN_PROGRESS;
 
@@ -65,7 +65,7 @@ abstract class AbstractLeptirTask
                 SIGALRM,
                 array(
                     $this,
-                    '__alarmHandler'
+                    'alarmHandler'
                 )
             );
             pcntl_alarm($timeLimit);
@@ -74,7 +74,7 @@ abstract class AbstractLeptirTask
         set_error_handler(
             array(
                 $this,
-                '__errorHandler'
+                'errorHandler'
             )
         );
 
@@ -107,7 +107,7 @@ abstract class AbstractLeptirTask
         $this->returnCode = $resp;
         @$this->afterFinish();
 
-        $this->__timeEnd = microtime(true);
+        $this->taskTimeEnd = microtime(true);
         $this->taskStatus = self::STATUS_COMPLETED;
 
         $this->printTaskEndLog();
@@ -177,7 +177,7 @@ abstract class AbstractLeptirTask
      *
      */
 
-    public function __errorHandler(
+    public function errorHandler(
         $errorNumber,
         $errorString,
         $errorFile,
@@ -315,10 +315,10 @@ abstract class AbstractLeptirTask
         return $defaultValue;
     }
 
-    final public function __alarmHandler()
+    final public function alarmHandler()
     {
         $this->logInfo('Task execution time exceeded.');
-        $this->__timeEnd = microtime(true);
+        $this->taskTimeEnd = microtime(true);
 
         throw new LeptirTaskException(LeptirTaskException::TIME_LIMIT_EXCEEDED);
     }
@@ -334,7 +334,7 @@ abstract class AbstractLeptirTask
     {
         $this->logInfo(
             'Task is done. Execution time: ' .
-            (string)(round($this->__timeEnd - $this->__timeStart, 4)) . ' seconds.'
+            (string)(round($this->taskTimeEnd - $this->taskTimeStart, 4)) . ' seconds.'
         );
     }
 
@@ -354,7 +354,7 @@ abstract class AbstractLeptirTask
 
     protected function getExecutionTime()
     {
-        return $this->__timeEnd - $this->__timeStart;
+        return $this->taskTimeEnd - $this->taskTimeStart;
     }
 
     protected function getTaskType()

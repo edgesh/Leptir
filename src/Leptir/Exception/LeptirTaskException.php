@@ -19,5 +19,4 @@ class LeptirTaskException extends AbstractLeptirException
                 return "Unknown exception.";
         }
     }
-
 }
