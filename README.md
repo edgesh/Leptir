@@ -3,6 +3,8 @@ Leptir
 
 Leptir is a asynchronous, highly scalable task processor which can use multiple brokers(queues) in parallel. Different priorities can be defined for different brokers.
 
+[![Build Status](https://travis-ci.org/Backplane/Leptir.png?branch=master)](https://travis-ci.org/Backplane/Leptir)
+
 Leptir configuration
 ----
 ```php
