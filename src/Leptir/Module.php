@@ -57,7 +57,7 @@ class Module implements
             ),
             'leptir stop [--pid=]' => 'Stop leptir process',
             array(
-                '--pid=' => 'PID file path (default: /var/run/leptir.pid'
+                '--pid=', 'PID file path (default: /var/run/leptir.pid'
             ),
             'leptir install [--config=] [--daemon] [--pid=] [--php_path=]' => 'Install leptir as a service',
             array(
