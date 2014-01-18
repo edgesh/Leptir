@@ -27,7 +27,7 @@ class RedisMetaStorage extends AbstractMetaStorage
      */
     private $key;
 
-    private $exipreAfterSeconds = -1;
+    private $expireAfterSeconds = -1;
 
     public function __construct(array $config = array())
     {
@@ -43,7 +43,7 @@ class RedisMetaStorage extends AbstractMetaStorage
         $configuration = $config['configuration'];
 
         if (isset($configuration['expire_after_seconds'])) {
-            $this->exipreAfterSeconds = intval($configuration['expire_after_seconds']);
+            $this->expireAfterSeconds = intval($configuration['expire_after_seconds']);
         }
 
         $this->redisClient = new Client(
@@ -62,8 +62,8 @@ class RedisMetaStorage extends AbstractMetaStorage
         $key = $this->key . ':' . $taskId;
 
         $this->redisClient->set($key, json_encode($object));
-        if ($this->exipreAfterSeconds > 0) {
-            $this->redisClient->expire($key, $this->exipreAfterSeconds);
+        if ($this->expireAfterSeconds > 0) {
+            $this->redisClient->expire($key, $this->expireAfterSeconds);
         }
     }
 
