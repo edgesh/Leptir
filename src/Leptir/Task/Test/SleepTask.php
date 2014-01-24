@@ -15,11 +15,10 @@ class SlowTask extends AbstractLeptirTask
 {
     protected function doJob()
     {
-        $sleepTime = rand(30, 50);
+        $sleepTime = $this->getString('seconds', 1);
         $this->logInfo('Sleeping for '. $sleepTime);
         sleep($sleepTime);
-
-        $this->addResponseLine('Task had a great nap');
+        $this->addResponseLine('Task had a great nap.');
         return self::EXIT_SUCCESS;
     }
 }

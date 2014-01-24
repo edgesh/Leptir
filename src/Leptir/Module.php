@@ -63,7 +63,7 @@ class Module implements
             array(
                 '--php_path=', 'Path to PHP interpreter'
             ),
-            'leptir tester <action> <taskName> [--config=] [--dalaySeconds=] [--priority=] [--number=] [--timeLimit=]' =>
+            'leptir push <taskName> [--config=] [--dalaySeconds=] [--priority=] [--number=] [--timeLimit=]' =>
                 'Leptir task testers - push testing tasks into the queue',
             array(
                 '--delaySeconds=', 'Schedule/delay tasks for some amount of seconds'

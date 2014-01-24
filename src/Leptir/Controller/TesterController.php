@@ -18,7 +18,6 @@ class TesterController extends BaseLeptirController
             throw new \RuntimeException('You can only use this action from a console.');
         }
 
-
         $priority = intval($request->getParam('priority', 0));
         $quantity = intval($request->getParam('number', 1));
         $delaySeconds = intval($request->getParam('delaySeconds', 0));
@@ -39,14 +38,15 @@ class TesterController extends BaseLeptirController
     private function getTaskFromName($name)
     {
         switch($name) {
-            case 'test':
-                return new TestTask(
+            case 'sleep':
+                /** @var Request $request */
+                $request = $this->getRequest();
+                $seconds = intval($request->getParam('seconds', 1));
+                return new SlowTask(
                     array(
-                        'message' => 'Test message'
+                        'seconds' => $seconds
                     )
                 );
-            case 'slow':
-                return new SlowTask();
             case 'error':
                 return new ErrorTask();
             case 'exception':

@@ -248,7 +248,10 @@ class Broker implements ServiceLocatorAwareInterface
 
         /** @var AbstractSimpleBroker $simpleBroker */
         $simpleBroker = $this->getBrokerForPriority($priority);
-        $simpleBroker->pushBrokerTask($brokerTask);
+        
+        if (!is_null($simpleBroker)) {
+            $simpleBroker->pushBrokerTask($brokerTask);
+        }
 
         return array(
             'id' => $taskId,

@@ -51,13 +51,9 @@ abstract class AbstractLeptirTask
     final public function execute($timeLimit = 0, MetaStorage $metaBackend = null)
     {
         $this->taskExecutionStartTime = new \DateTime();
-
         $this->saveTaskMetaInfo();
-
         $this->metaBackend = $metaBackend;
-
         $this->taskTimeStart = microtime(true);
-
         $this->taskStatus = self::STATUS_IN_PROGRESS;
 
         if ($timeLimit > 0) {
