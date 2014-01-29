@@ -311,6 +311,17 @@ abstract class AbstractLeptirTask
         return $defaultValue;
     }
 
+    protected function setData($paramName, $paramValue, $override = true)
+    {
+        if ($override) {
+            $this->parameters[$paramName] = $paramValue;
+        } else {
+            if (!isset($this->parameters[$paramName])) {
+                $this->parameters[$paramName] = $paramValue;
+            }
+        }
+    }
+
     final public function alarmHandler()
     {
         $this->logInfo('Task execution time exceeded.');
