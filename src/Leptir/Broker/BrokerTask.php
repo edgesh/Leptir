@@ -115,12 +115,12 @@ class BrokerTask
     /**
      * Execute inner task.
      */
-    final public function execute($timeLimit = 0, MetaStorage $metaBackend = null)
+    final public function execute($timeLimit = 0, MetaStorage $metaBackend = null, $graceful = false)
     {
         if ($this->getTimeLimit() <= 0) {
-            $this->task->execute($timeLimit, $metaBackend);
+            $this->task->execute($timeLimit, $metaBackend, $graceful);
         } else {
-            $this->task->execute($this->getTimeLimit(), $metaBackend);
+            $this->task->execute($this->getTimeLimit(), $metaBackend, $graceful);
         }
     }
 

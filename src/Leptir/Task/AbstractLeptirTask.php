@@ -48,7 +48,7 @@ abstract class AbstractLeptirTask
     /**
      * Method which triggers task execution and all the dependencies that come with that.
      */
-    final public function execute($timeLimit = 0, MetaStorage $metaBackend = null)
+    final public function execute($timeLimit = 0, MetaStorage $metaBackend = null, $graceful = false)
     {
         $this->taskExecutionStartTime = new \DateTime();
         $this->saveTaskMetaInfo();
@@ -56,7 +56,7 @@ abstract class AbstractLeptirTask
         $this->taskTimeStart = microtime(true);
         $this->taskStatus = self::STATUS_IN_PROGRESS;
 
-        if ($timeLimit > 0) {
+        if ($timeLimit > 0 && $graceful) {
             pcntl_signal(
                 SIGALRM,
                 array(
@@ -67,12 +67,14 @@ abstract class AbstractLeptirTask
             pcntl_alarm($timeLimit);
         }
 
-        set_error_handler(
-            array(
-                $this,
-                'errorHandler'
-            )
-        );
+        if ($graceful) {
+            set_error_handler(
+                array(
+                    $this,
+                    'errorHandler'
+                )
+            );
+        }
 
         $this->printTaskStartLog();
 
@@ -80,17 +82,25 @@ abstract class AbstractLeptirTask
         try {
             $resp = $this->doJob();
         } catch (LeptirTaskException $ex) {
-            if ($ex->getCode() == LeptirTaskException::TIME_LIMIT_EXCEEDED) {
-                $resp = self::EXIT_TIME_LIMIT_EXCEEDED;
-                $this->addResponseLine('Time limit exceeded.');
+            if (!$graceful) {
+                throw $ex;
             } else {
-                $resp = self::EXIT_ERROR;
-                $this->addResponseLine('LeptirTaskException occurred. ' . $ex->getMessage());
+                if ($ex->getCode() == LeptirTaskException::TIME_LIMIT_EXCEEDED) {
+                    $resp = self::EXIT_TIME_LIMIT_EXCEEDED;
+                    $this->addResponseLine('Time limit exceeded.');
+                } else {
+                    $resp = self::EXIT_ERROR;
+                    $this->addResponseLine('LeptirTaskException occurred. ' . $ex->getMessage());
+                }
             }
         } catch (\Exception $ex) {
-            $this->addResponseLine('Task exited with exception: ' . $ex->getMessage());
-            $this->logError('Task exited with exception: ' . $ex->getMessage());
-            $resp = self::EXIT_ERROR;
+            if (!$graceful) {
+                throw $ex;
+            } else {
+                $this->addResponseLine('Task exited with exception: ' . $ex->getMessage());
+                $this->logError('Task exited with exception: ' . $ex->getMessage());
+                $resp = self::EXIT_ERROR;
+            }
         }
 
         if ($resp !== self::EXIT_SUCCESS &&

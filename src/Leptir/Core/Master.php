@@ -166,20 +166,13 @@ class Master extends CurrentProcess
     {
         $task->subscribeLoggers($this->loggers);
         try {
-            $task->execute($this->configTaskExecutionTime, $this->metaBackend);
+            $task->execute(
+                $this->configTaskExecutionTime, // execution time
+                $this->metaBackend, // backend storage
+                true // graceful
+            );
         } catch (LeptirTaskException $e) { // time limit exceeded exception
-            switch($e->getCode()) {
-                case LeptirTaskException::TIME_LIMIT_EXCEEDED:
-                    // TODO this part is usefull
-                    break;
-                case LeptirTaskException::RUNTIME_ERROR_OCCURRED:
-                    // TODO also pretty usefull
-                    break;
-                default:
-                    break;
-            }
         } catch (\Exception $e) {
-            // all the other exceptions
         }
     }
 }
