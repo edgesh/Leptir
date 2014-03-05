@@ -30,7 +30,7 @@ class TaskTest extends AbstractControllerTestCase
              * Task would usually run for 10 seconds
              * We are testing execution time limiting here
              */
-            $this->task->execute(1, $backend);
+            $this->task->execute(1, $backend, true);
         } catch (LeptirTaskException $e) {
             $this->assertEquals($e->getCode(), LeptirTaskException::TIME_LIMIT_EXCEEDED);
         }
@@ -43,7 +43,7 @@ class TaskTest extends AbstractControllerTestCase
     {
         $backend = new MockMetaStorage(new MockMetaBackend());
         $task = new MockPHPErrorTask();
-        $task->execute(0, $backend);
+        $task->execute(0, $backend, true);
 
         $this->assertNotNull($backend->testGetSavedInfo());
 
