@@ -7,6 +7,7 @@ use LeptirTest\Mocks\MockMetaBackend;
 use LeptirTest\Mocks\MockPHPErrorTask;
 use LeptirTest\Mocks\MockSlowTask;
 use LeptirTest\Mocks\MockMetaStorage;
+use LeptirTest\Mocks\MockTaskWithStates;
 use Zend\Test\PHPUnit\Controller\AbstractControllerTestCase;
 
 class TaskTest extends AbstractControllerTestCase
@@ -50,5 +51,17 @@ class TaskTest extends AbstractControllerTestCase
         $info = $backend->testGetSavedInfo();
 
         $this->assertArrayHasKey('respM', $info);
+    }
+
+    public function setTaskStateChange()
+    {
+        $backend = new MockMetaStorage(new MockMetaBackend());
+        $task = new MockTaskWithStates();
+        $task->execute(0, $backend, true);
+
+        $lastState = $task->getLastState();
+        $flow = $task->getExecutionFlow();
+        $this->assertEquals(3, $lastState);
+        $this->assertEquals($flow, array(1, 2, 3));
     }
 }

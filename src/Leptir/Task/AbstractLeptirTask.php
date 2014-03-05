@@ -30,6 +30,7 @@ abstract class AbstractLeptirTask
     private $taskId = '';
     private $taskStatus = self::STATUS_PENDING;
     private $taskExecutionStartTime = null;
+    private $executionFlow = array();
 
     /**
      * @var MetaStorage|null
@@ -418,5 +419,38 @@ abstract class AbstractLeptirTask
             $info = $this->getMetaInfo();
             $this->metaBackend->saveMetaInfo($info);
         }
+    }
+
+    /**
+     * Change current state of task - to keep track of execution flow
+     *
+     * @param $state
+     */
+    protected function changeState($state)
+    {
+        $this->executionFlow[] = $state;
+    }
+
+    /**
+     * Get last state task was in so far
+     *
+     * @return mixed|null
+     */
+    public function getLastState()
+    {
+        if (empty($this->executionFlow)) {
+            return null;
+        }
+        return end($this->executionFlow);
+    }
+
+    /**
+     * Get the whole execution flow
+     *
+     * @return array
+     */
+    public function getExecutionFlow()
+    {
+        return $this->executionFlow;
     }
 }
