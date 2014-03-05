@@ -328,7 +328,10 @@ Method will return float number represending the execution time.
 ```php
     protected function logDebug($message)
 ```
- 
+* **Execution flow methods** - task execution flow can be tracked - helps writing unittest for user written tasks
+- `changeState($state)` - change current state of the execution
+- `getLastState()` - get last state task was in
+- `getExecutionFlow()` - returns an array with list of states task was in while running
 
 Command line actions
 ----
