@@ -153,6 +153,7 @@ class BaseLeptirController extends AbstractActionController
     {
         if (is_null($this->errorReporting)) {
             $this->errorReporting = new ErrorReport($this->getErrorReportingConfig());
+            $this->errorReporting->setServiceLocator($this->getServiceLocator());
         }
         return $this->errorReporting;
     }
