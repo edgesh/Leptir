@@ -1,6 +1,7 @@
 <?php
 
 namespace Leptir\ErrorReport;
+
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -60,7 +61,7 @@ class ErrorReport implements ErrorReportInterface, ServiceLocatorAwareInterface
      */
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
-        foreach($this->errorReportingObjects as $object) {
+        foreach ($this->errorReportingObjects as $object) {
             if ($object instanceof ServiceLocatorAwareInterface) {
                 $object->setServiceLocator($serviceLocator);
             }
@@ -77,6 +78,4 @@ class ErrorReport implements ErrorReportInterface, ServiceLocatorAwareInterface
     {
         return $this->serviceLocator;
     }
-
-
 }
