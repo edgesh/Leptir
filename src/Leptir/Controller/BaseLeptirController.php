@@ -4,6 +4,7 @@ namespace Leptir\Controller;
 
 use Leptir\Broker\Broker;
 use Leptir\Core\Master;
+use Leptir\ErrorReport\ErrorReport;
 use Leptir\Logger\LeptirLoggerFactory;
 use Leptir\MetaStorage\MetaStorage;
 use Leptir\MetaStorage\MetaStorageFactory;
@@ -18,6 +19,7 @@ class BaseLeptirController extends AbstractActionController
 {
     protected $config = array();
     protected $loggers = array();
+    protected $errorReporting = null;
     protected $metaStorage = null;
     protected $broker = null;
     protected $master = null;
@@ -104,7 +106,8 @@ class BaseLeptirController extends AbstractActionController
                 $this->getBroker(),
                 $this->getMasterConfig(),
                 $this->getLoggers(),
-                $this->getMetaStorage()
+                $this->getMetaStorage(),
+                $this->getErrorReportingObject()
             );
         }
 
@@ -131,7 +134,7 @@ class BaseLeptirController extends AbstractActionController
     }
 
     /**
-     * @return \Leptir\MetaStorage\MongoMetaStorage|null
+     * @return \Leptir\MetaStorage\MetaStorage|null
      */
     protected function getMetaStorage()
     {
@@ -139,6 +142,19 @@ class BaseLeptirController extends AbstractActionController
             $this->metaStorage = new MetaStorage($this->getMetaStorageConfig());
         }
         return $this->metaStorage;
+    }
+
+    protected function getErrorReportingConfig()
+    {
+        return $this->getConfigByKey('error_reporting');
+    }
+
+    protected function getErrorReportingObject()
+    {
+        if (is_null($this->errorReporting)) {
+            $this->errorReporting = new ErrorReport($this->getErrorReportingConfig());
+        }
+        return $this->errorReporting;
     }
 
     protected function writeErrorLine($line)

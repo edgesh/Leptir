@@ -2,6 +2,8 @@
 
 namespace Leptir\Task;
 
+use Leptir\ErrorReport\ErrorReport;
+use Leptir\ErrorReport\ErrorReportInterface;
 use Leptir\Exception\LeptirInputException;
 use Leptir\Exception\LeptirTaskException;
 use Leptir\Logger\LeptirLoggerTrait;
@@ -37,6 +39,11 @@ abstract class AbstractLeptirTask
      */
     private $metaBackend = null;
 
+    /**
+     * @var ErrorReport
+     */
+    private $errorReporting = null;
+
     private $taskTimeStart;
     private $taskTimeEnd;
 
@@ -49,11 +56,16 @@ abstract class AbstractLeptirTask
     /**
      * Method which triggers task execution and all the dependencies that come with that.
      */
-    final public function execute($timeLimit = 0, MetaStorage $metaBackend = null, $graceful = false)
-    {
+    final public function execute(
+        $timeLimit = 0,
+        MetaStorage $metaBackend = null,
+        $graceful = false,
+        ErrorReport $errorReport = null
+    ) {
         $this->taskExecutionStartTime = new \DateTime();
         $this->saveTaskMetaInfo();
         $this->metaBackend = $metaBackend;
+        $this->errorReporting = $errorReport;
         $this->taskTimeStart = microtime(true);
         $this->taskStatus = self::STATUS_IN_PROGRESS;
 
@@ -89,9 +101,20 @@ abstract class AbstractLeptirTask
                 if ($ex->getCode() == LeptirTaskException::TIME_LIMIT_EXCEEDED) {
                     $resp = self::EXIT_TIME_LIMIT_EXCEEDED;
                     $this->addResponseLine('Time limit exceeded.');
+                    $this->errorReporting->addErrorData(
+                        array(
+                            'ErrType' => 'TimeLimit',
+                            'TaskType' => $this->getTaskType(),
+                            'TaskId' => $this->taskId
+                        )
+                    );
+                    $this->errorReporting->reportErrorMessage('Task time limit exceeded.');
                 } else {
                     $resp = self::EXIT_ERROR;
                     $this->addResponseLine('LeptirTaskException occurred. ' . $ex->getMessage());
+                    if ($this->errorReporting instanceof ErrorReportInterface) {
+                        $this->errorReporting->reportException($ex);
+                    }
                 }
             }
         } catch (\Exception $ex) {
@@ -100,6 +123,9 @@ abstract class AbstractLeptirTask
             } else {
                 $this->addResponseLine('Task exited with exception: ' . $ex->getMessage());
                 $this->logError('Task exited with exception: ' . $ex->getMessage());
+                if ($this->errorReporting instanceof ErrorReportInterface) {
+                   $this->errorReporting->reportException($ex);
+                }
                 $resp = self::EXIT_ERROR;
             }
         }
@@ -206,11 +232,25 @@ abstract class AbstractLeptirTask
                 $responseLine = '[Error] ';
                 break;
         }
-
+        if ($this->errorReporting instanceof ErrorReportInterface)
+        {
+            $this->errorReporting->addErrorData(
+                array(
+                    'Line' => $errorLine,
+                    'File' => $errorFile,
+                    'Number' => $errorNumber,
+                    'ErrType' => $responseLine,
+                    'TaskType' => $this->getTaskType(),
+                    'TaskId' => $this->taskId
+                )
+            );
+            $this->errorReporting->reportErrorMessage($errorString);
+        }
         $responseLine .= $errorString . ' (File: ' . $errorFile . ', Line: ' . (string)$errorLine . ')';
         $this->responseLines = array(
             $responseLine
         );
+        $this->logError('Error in task: ' . $responseLine);
 
         $this->saveTaskMetaInfo();
         return true;

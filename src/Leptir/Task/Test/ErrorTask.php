@@ -13,6 +13,7 @@ class ErrorTask extends AbstractLeptirTask
      */
     protected function doJob()
     {
+        $this->logInfo('Triggering an error.');
         trigger_error('Very nice! How much?');
     }
 }

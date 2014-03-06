@@ -2,6 +2,7 @@
 
 namespace Leptir\Broker;
 
+use Leptir\ErrorReport\ErrorReport;
 use Leptir\MetaStorage\MetaStorage;
 use Leptir\Task\AbstractLeptirTask;
 use Zend\Log\Logger;
@@ -115,12 +116,16 @@ class BrokerTask
     /**
      * Execute inner task.
      */
-    final public function execute($timeLimit = 0, MetaStorage $metaBackend = null, $graceful = false)
-    {
+    final public function execute(
+        $timeLimit = 0,
+        MetaStorage $metaBackend = null,
+        $graceful = false,
+        ErrorReport $errorReport = null
+    ) {
         if ($this->getTimeLimit() <= 0) {
-            $this->task->execute($timeLimit, $metaBackend, $graceful);
+            $this->task->execute($timeLimit, $metaBackend, $graceful, $errorReport);
         } else {
-            $this->task->execute($this->getTimeLimit(), $metaBackend, $graceful);
+            $this->task->execute($this->getTimeLimit(), $metaBackend, $graceful, $errorReport);
         }
     }
 

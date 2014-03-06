@@ -4,6 +4,7 @@ namespace Leptir\Core;
 
 use Leptir\Broker\Broker;
 use Leptir\Broker\BrokerTask;
+use Leptir\ErrorReport\ErrorReport;
 use Leptir\Exception\LeptirTaskException;
 use Leptir\Logger\LeptirLoggerTrait;
 use Leptir\MetaStorage\MetaStorage;
@@ -26,6 +27,7 @@ class Master extends CurrentProcess
 
     private $isRunning = true;
     private $metaBackend = null;
+    private $errorReporting = null;
 
     private $isDaemon = false;
 
@@ -33,7 +35,8 @@ class Master extends CurrentProcess
         Broker $broker,
         array $masterConfig,
         array $loggers = array(),
-        MetaStorage $metaBackend = null
+        MetaStorage $metaBackend = null,
+        ErrorReport $errorReport = null
     ) {
         $configuration = $masterConfig['configuration'];
 
@@ -57,6 +60,7 @@ class Master extends CurrentProcess
         $this->loggers = $loggers;
         $this->broker = $broker;
         $this->metaBackend = $metaBackend;
+        $this->errorReporting = $errorReport;
         $this->isRunning = true;
 
         // ticks
@@ -169,7 +173,8 @@ class Master extends CurrentProcess
             $task->execute(
                 $this->configTaskExecutionTime, // execution time
                 $this->metaBackend, // backend storage
-                true // graceful
+                true, // graceful
+                $this->errorReporting
             );
         } catch (LeptirTaskException $e) { // time limit exceeded exception
         } catch (\Exception $e) {
