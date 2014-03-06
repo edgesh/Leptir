@@ -57,6 +57,11 @@ Leptir configuration
                 array(
                     // storage configuraion
                 )
+            ),
+            'error_reporting' => array(
+            	array(
+            	    'class' => 'Application\ErrorReporting\ErrorReporting'
+            	)
             )
         )
     )
@@ -255,6 +260,25 @@ Configuration examples:
         )
 ```
 `logfile` and `stdoutlog` are names (used only for readibility). STDOUT and STDERR loggers don't require additional options. Logfile `path` is mandatory for file logger.
+
+Error reporting
+----
+Leptir will catch all the exceptions and errors and include this information into meta information. Sometimes there's a need to report every error to the third party service for easier tracking. We can define multiple error reporting implementations and configure leptir to forward every error and exception using these implementations. Every implementation of error reporting object must implement `Leptir\ErrorReport\ErrorReportInterface`.
+Configuration example:
+```php
+	'error_reporting' => array(
+		array(
+			'class' => 'Application\ErrorReporting\ErrorReporting'
+		)
+	)
+```
+ErrorReportingInterface contains methos:
+- `reportException(\Exception $ex)`
+- `reportMessage($message)`
+- `addErrorData($errorData)`
+
+ErrorData (additional error information) is not automatically cleared. Error reporting implementation needs to clear data for each report manually if needed.
+
 
 Tasks
 ---
