@@ -14,8 +14,7 @@ class ErrorReport implements ErrorReportInterface
 
     public function __construct($config)
     {
-        foreach($config as $simpleConfig)
-        {
+        foreach ($config as $simpleConfig) {
             if (!isset($simpleConfig['class'])) {
                 continue;
             }
@@ -30,7 +29,7 @@ class ErrorReport implements ErrorReportInterface
     public function reportException(\Exception $ex)
     {
         /** @var $errorReporting ErrorReportInterface */
-        foreach($this->errorReportingObjects as $errorReporting) {
+        foreach ($this->errorReportingObjects as $errorReporting) {
             $errorReporting->reportException($ex);
         }
     }
@@ -38,7 +37,7 @@ class ErrorReport implements ErrorReportInterface
     public function reportErrorMessage($message)
     {
         /** @var $errorReporting ErrorReportInterface */
-        foreach($this->errorReportingObjects as $errorReporting) {
+        foreach ($this->errorReportingObjects as $errorReporting) {
             $errorReporting->reportErrorMessage($message);
         }
     }
@@ -46,7 +45,7 @@ class ErrorReport implements ErrorReportInterface
     public function addErrorData(array $data)
     {
         /** @var $errorReporting ErrorReportInterface */
-        foreach($this->errorReportingObjects as $errorReporting) {
+        foreach ($this->errorReportingObjects as $errorReporting) {
             $errorReporting->addErrorData($data);
         }
     }

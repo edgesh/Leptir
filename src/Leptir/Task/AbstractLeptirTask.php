@@ -124,7 +124,7 @@ abstract class AbstractLeptirTask
                 $this->addResponseLine('Task exited with exception: ' . $ex->getMessage());
                 $this->logError('Task exited with exception: ' . $ex->getMessage());
                 if ($this->errorReporting instanceof ErrorReportInterface) {
-                   $this->errorReporting->reportException($ex);
+                    $this->errorReporting->reportException($ex);
                 }
                 $resp = self::EXIT_ERROR;
             }
@@ -232,8 +232,7 @@ abstract class AbstractLeptirTask
                 $responseLine = '[Error] ';
                 break;
         }
-        if ($this->errorReporting instanceof ErrorReportInterface)
-        {
+        if ($this->errorReporting instanceof ErrorReportInterface) {
             $this->errorReporting->addErrorData(
                 array(
                     'Line' => $errorLine,
